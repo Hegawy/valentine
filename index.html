@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Pasant & Yusuf 💘</title>
+
+  <style>
+    :root{
+      --pink:#ff3b7a;
+      --dark:#111;
+      --card: rgba(255,255,255,0.92);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      height:100vh;
+      overflow:hidden;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:#111;
+      background:#000;
+    }
+
+    /* ---------- Background slideshow ---------- */
+    .bg{
+      position:fixed; inset:0;
+      z-index:-2;
+      overflow:hidden;
+      background:#000;
+    }
+    .bg::after{
+      /* soft dark overlay for readability */
+      content:"";
+      position:absolute; inset:0;
+      background: rgba(0,0,0,0.35);
+      z-index:2;
+    }
+    .bg-slide{
+      position:absolute; inset:-20px;
+      background-size:cover;
+      background-position:center;
+      filter: blur(2px) saturate(1.05);
+      transform: scale(1.05);
+      opacity:0;
+      transition: opacity 1.2s ease-in-out;
+      z-index:1;
+    }
+
+    /* ---------- Main card ---------- */
+    .wrap{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .card{
+      width:min(520px, 94vw);
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border-radius: 22px;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.25);
+      padding: 22px;
+      position:relative;
+      overflow:hidden;
+    }
+    .top{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom: 10px;
+    }
+    .names{
+      flex:1;
+    }
+    h1{
+      margin:0;
+      font-size: 26px;
+      line-height:1.15;
+    }
+    .sub{
+      margin:6px 0 0;
+      opacity:.75;
+      font-size:14px;
+    }
+
+    .pfps{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .pfp{
+      width:54px; height:54px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.8);
+      box-shadow:0 10px 22px rgba(0,0,0,0.18);
+      object-fit:cover;
+      background:#ddd;
+    }
+
+    .question{
+      margin: 14px 0 14px;
+      font-size: 18px;
+      opacity:.9;
+    }
+
+    .btns{
+      position:relative;
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      align-items:center;
+      margin-top: 8px;
+      min-height: 60px; /* gives room for teleporting button */
+    }
+
+    button{
+      border:0;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-size: 16px;
+      cursor:pointer;
+      transition: transform .12s ease, filter .12s ease;
+      user-select:none;
+    }
+    button:active{ transform: scale(0.98); }
+
+    #yes{
+      background: var(--pink);
+      color:#fff;
+      font-weight:700;
+      box-shadow: 0 14px 30px rgba(255,59,122,0.25);
+    }
+
+    /* No starts normal but becomes impossible to click */
+    #no{
+      background: #1b1b1b;
+      color:#fff;
+      position:absolute; /* allow teleport inside card */
+      right: 20px;
+      top: 0px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+    }
+
+    .yay{
+      display:none;
+      margin-top: 14px;
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: rgba(255, 235, 243, 0.9);
+      border: 1px solid rgba(255, 59, 122, 0.25);
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .spotify{
+      margin-top: 14px;
+      border-radius: 16px;
+      overflow:hidden;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .tiny{
+      margin-top:10px;
+      font-size:12px;
+      opacity:.75;
+      text-align:center;
+    }
+
+    /* Confetti canvas on top */
+    #confettiCanvas{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:9999;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Background slides (add/remove as you want) -->
+  <div class="bg" id="bg">
+    <div class="bg-slide" style="background-image:url('images/bg1.jpg')"></div>
+    <div class="bg-slide" style="background-image:url('images/bg2.jpg')"></div>
+    <div class="bg-slide" style="background-image:url('images/bg3.jpg')"></div>
+    <div class="bg-slide" style="background-image:url('images/bg4.jpg')"></div>
+  </div>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="wrap">
+    <div class="card" id="card">
+      <div class="top">
+        <div class="names">
+          <h1>Pasant & Yusuf 💘</h1>
+          <p class="sub">A very serious question (not really).</p>
+        </div>
+
+        <div class="pfps">
+          <img class="pfp" src="images/pasant.jpg" alt="Pasant">
+          <img class="pfp" src="images/yusuf.jpg" alt="Yusuf">
+        </div>
+      </div>
+
+      <div class="question">
+        Pasant… will you be my Valentine? 🌹
+      </div>
+
+      <div class="btns" id="btnArea">
+        <button id="yes">Yes 😌</button>
+        <button id="no">No 🙂</button>
+      </div>
+
+      <div class="yay" id="yay">
+        YAAAAY!! ❤️🎉<br/>
+        Okay now you’re officially locked in 😄<br/>
+        Text me: <b>"YES Valentine"</b>
+      </div>
+
+      <!-- Spotify embed (replace the track link in src) -->
+      <div class="spotify">
+        <iframe
+          id="spotify"
+          style="border-radius:16px"
+          src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator"
+          width="100%"
+          height="152"
+          frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy">
+        </iframe>
+      </div>
+
+      <div class="tiny">
+        Tip: If you added <b>song.mp3</b>, it’ll play when “Yes” is clicked.
+      </div>
+
+      <!-- Optional local audio (works only after user interaction) -->
+      <audio id="song" src="song.mp3" preload="auto"></audio>
+    </div>
+  </div>
+
+  <!-- Confetti library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <script>
+    /* ---------- Background slideshow logic ---------- */
+    const slides = Array.from(document.querySelectorAll(".bg-slide"));
+    let idx = 0;
+
+    function showSlide(i){
+      slides.forEach((s, k) => s.style.opacity = (k === i ? "1" : "0"));
+    }
+    showSlide(idx);
+
+    setInterval(() => {
+      idx = (idx + 1) % slides.length;
+      showSlide(idx);
+    }, 4500); // change speed here
+
+    /* ---------- No button: teleport on hover/click ---------- */
+    const noBtn = document.getElementById("no");
+    const card = document.getElementById("card");
+    const btnArea = document.getElementById("btnArea");
+
+    function teleportNo(){
+      const areaRect = btnArea.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      // Keep inside the button area + some padding
+      const pad = 8;
+      const maxX = areaRect.width - btnRect.width - pad;
+      const maxY = areaRect.height - btnRect.height - pad;
+
+      const x = Math.max(pad, Math.random() * maxX);
+      const y = Math.max(pad, Math.random() * maxY);
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+    }
+
+    // Make it basically unclickable
+    noBtn.addEventListener("mouseenter", teleportNo);
+    noBtn.addEventListener("mousemove", teleportNo);
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      teleportNo();
+    });
+
+    // Start it somewhere not annoying
+    setTimeout(teleportNo, 200);
+
+    /* ---------- Yes: confetti + reveal + play song ---------- */
+    const yesBtn = document.getElementById("yes");
+    const yay = document.getElementById("yay");
+    const song = document.getElementById("song");
+
+    const myConfetti = confetti.create(document.getElementById("confettiCanvas"), {
+      resize: true,
+      useWorker: true
+    });
+
+    function burst(){
+      myConfetti({ particleCount: 140, spread: 70, origin: { y: 0.65 } });
+      setTimeout(() => myConfetti({ particleCount: 90, spread: 110, origin: { y: 0.55 } }), 200);
+      setTimeout(() => myConfetti({ particleCount: 70, spread: 90, origin: { y: 0.6 } }), 420);
+    }
+
+    yesBtn.addEventListener("click", async () => {
+      yay.style.display = "block";
+      yesBtn.textContent = "Locked in ✅";
+      yesBtn.disabled = true;
+
+      // Make "No" disappear after YES
+      noBtn.style.display = "none";
+
+      // Confetti!
+      burst();
+
+      // Try to play local mp3 if it exists
+      try {
+        if (song && song.getAttribute("src")) {
+          await song.play();
+        }
+      } catch (err) {
+        // Autoplay may be blocked if file missing or browser policy
+        // No worries — Spotify embed still there.
+      }
+    });
+  </script>
+</body>
+</html>
