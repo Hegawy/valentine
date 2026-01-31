@@ -1,333 +1,304 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Pasant & Yusuf 💘</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pasant & Yusuf 💘</title>
 
-  <style>
-    :root{
-      --pink:#ff3b7a;
-      --dark:#111;
-      --card: rgba(255,255,255,0.92);
-    }
+<style>
+:root{
+  --pink:#ff3b7a;
+  --card:rgba(255,255,255,0.92);
+}
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      height:100vh;
-      overflow:hidden;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:#111;
-      background:#000;
-    }
+*{box-sizing:border-box;}
 
-    /* ---------- Background slideshow ---------- */
-    .bg{
-      position:fixed; inset:0;
-      z-index:-2;
-      overflow:hidden;
-      background:#000;
-    }
-    .bg::after{
-      /* soft dark overlay for readability */
-      content:"";
-      position:absolute; inset:0;
-      background: rgba(0,0,0,0.35);
-      z-index:2;
-    }
-    .bg-slide{
-      position:absolute; inset:-20px;
-      background-size:cover;
-      background-position:center;
-      filter: blur(2px) saturate(1.05);
-      transform: scale(1.05);
-      opacity:0;
-      transition: opacity 1.2s ease-in-out;
-      z-index:1;
-    }
+body{
+  margin:0;
+  height:100vh;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  overflow:hidden;
+  background:#000;
+}
 
-    /* ---------- Main card ---------- */
-    .wrap{
-      height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-    }
-    .card{
-      width:min(520px, 94vw);
-      background: var(--card);
-      backdrop-filter: blur(10px);
-      border-radius: 22px;
-      box-shadow: 0 16px 50px rgba(0,0,0,0.25);
-      padding: 22px;
-      position:relative;
-      overflow:hidden;
-    }
-    .top{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      margin-bottom: 10px;
-    }
-    .names{
-      flex:1;
-    }
-    h1{
-      margin:0;
-      font-size: 26px;
-      line-height:1.15;
-    }
-    .sub{
-      margin:6px 0 0;
-      opacity:.75;
-      font-size:14px;
-    }
+/* ===== BACKGROUND SLIDESHOW ===== */
+.bg{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+}
+.bg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  z-index:2;
+}
+.bg-slide{
+  position:absolute;
+  inset:-20px;
+  background-size:cover;
+  background-position:center;
+  opacity:0;
+  transition:opacity 1.2s ease;
+  filter: blur(2px) saturate(1.1);
+}
+.bg-slide.active{opacity:1;}
 
-    .pfps{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-    .pfp{
-      width:54px; height:54px;
-      border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.8);
-      box-shadow:0 10px 22px rgba(0,0,0,0.18);
-      object-fit:cover;
-      background:#ddd;
-    }
+/* ===== CARD ===== */
+.wrap{
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
 
-    .question{
-      margin: 14px 0 14px;
-      font-size: 18px;
-      opacity:.9;
-    }
+.card{
+  width:min(520px,94vw);
+  background:var(--card);
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 18px 50px rgba(0,0,0,0.3);
+  position:relative;
+}
 
-    .btns{
-      position:relative;
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      align-items:center;
-      margin-top: 8px;
-      min-height: 60px; /* gives room for teleporting button */
-    }
+/* ===== HEADER ===== */
+.top{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
 
-    button{
-      border:0;
-      padding: 12px 18px;
-      border-radius: 14px;
-      font-size: 16px;
-      cursor:pointer;
-      transition: transform .12s ease, filter .12s ease;
-      user-select:none;
-    }
-    button:active{ transform: scale(0.98); }
+h1{
+  margin:0;
+  font-size:26px;
+}
 
-    #yes{
-      background: var(--pink);
-      color:#fff;
-      font-weight:700;
-      box-shadow: 0 14px 30px rgba(255,59,122,0.25);
-    }
+.sub{
+  margin-top:6px;
+  opacity:.75;
+  font-size:14px;
+}
 
-    /* No starts normal but becomes impossible to click */
-    #no{
-      background: #1b1b1b;
-      color:#fff;
-      position:absolute; /* allow teleport inside card */
-      right: 20px;
-      top: 0px;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.25);
-    }
+/* ===== PROFILE PHOTOS ===== */
+.pfps{
+  margin-left:auto;
+  position:relative;
+}
 
-    .yay{
-      display:none;
-      margin-top: 14px;
-      padding: 14px 14px;
-      border-radius: 16px;
-      background: rgba(255, 235, 243, 0.9);
-      border: 1px solid rgba(255, 59, 122, 0.25);
-      font-size: 16px;
-      line-height: 1.4;
-    }
+.pfpPair{
+  display:flex;
+  gap:10px;
+  transition:.45s ease;
+}
 
-    .spotify{
-      margin-top: 14px;
-      border-radius: 16px;
-      overflow:hidden;
-      border: 1px solid rgba(0,0,0,0.08);
-    }
+.pfp{
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  border:3px solid #fff;
+  object-fit:cover;
+  box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
 
-    .tiny{
-      margin-top:10px;
-      font-size:12px;
-      opacity:.75;
-      text-align:center;
-    }
+/* MERGED COUPLE PHOTO */
+.pfpCouple{
+  width:130px;
+  height:56px;
+  border-radius:999px;
+  overflow:hidden;
+  border:3px solid #fff;
+  position:absolute;
+  top:0;
+  right:0;
+  opacity:0;
+  transform:scale(.7);
+  filter:blur(2px);
+  transition:.55s ease;
+}
+.pfpCouple img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
 
-    /* Confetti canvas on top */
-    #confettiCanvas{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:9999;
-    }
-  </style>
+/* AFTER YES */
+.merged .pfpPair{
+  opacity:0;
+  transform:scale(.5);
+  filter:blur(2px);
+}
+.merged .pfpCouple{
+  opacity:1;
+  transform:scale(1);
+  filter:none;
+}
+
+/* ===== TEXT ===== */
+.question{
+  margin:16px 0;
+  font-size:18px;
+}
+
+/* ===== BUTTONS ===== */
+.btns{
+  position:relative;
+  height:60px;
+}
+
+button{
+  padding:12px 18px;
+  border-radius:14px;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+}
+
+#yes{
+  background:var(--pink);
+  color:white;
+  font-weight:700;
+}
+
+#no{
+  position:absolute;
+  background:#111;
+  color:white;
+  right:0;
+  top:0;
+}
+
+/* ===== RESULT ===== */
+.yay{
+  display:none;
+  margin-top:16px;
+  padding:14px;
+  border-radius:14px;
+  background:#ffe6f0;
+}
+
+/* ===== SPOTIFY ===== */
+.spotify{
+  margin-top:14px;
+  border-radius:14px;
+  overflow:hidden;
+}
+
+/* ===== CONFETTI ===== */
+#confetti{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:9999;
+}
+</style>
 </head>
 
 <body>
-  <!-- Background slides (add/remove as you want) -->
-  <div class="bg" id="bg">
-    <div class="bg-slide" style="background-image:url('images/bg1.jpg')"></div>
-    <div class="bg-slide" style="background-image:url('images/bg2.jpg')"></div>
-    <div class="bg-slide" style="background-image:url('images/bg3.jpg')"></div>
-    <div class="bg-slide" style="background-image:url('images/bg4.jpg')"></div>
-  </div>
 
-  <canvas id="confettiCanvas"></canvas>
+<!-- BACKGROUND -->
+<div class="bg">
+  <div class="bg-slide active" style="background-image:url('images/bg1.jpg')"></div>
+  <div class="bg-slide" style="background-image:url('images/bg2.jpg')"></div>
+  <div class="bg-slide" style="background-image:url('images/bg3.jpg')"></div>
+  <div class="bg-slide" style="background-image:url('images/bg4.jpg')"></div>
+</div>
 
-  <div class="wrap">
-    <div class="card" id="card">
-      <div class="top">
-        <div class="names">
-          <h1>Pasant & Yusuf 💘</h1>
-          <p class="sub">A very serious question (not really).</p>
+<canvas id="confetti"></canvas>
+
+<div class="wrap">
+  <div class="card" id="card">
+
+    <div class="top">
+      <div>
+        <h1 id="title">Will you be my Valentine? 💘</h1>
+        <div class="sub">Answer wisely.</div>
+      </div>
+
+      <div class="pfps" id="pfps">
+        <div class="pfpPair">
+          <img class="pfp" src="images/pasant1.jpg">
+          <img class="pfp" src="images/yusuf1.jpg">
         </div>
-
-        <div class="pfps">
-          <img class="pfp" src="images/pasant.jpg" alt="Pasant">
-          <img class="pfp" src="images/yusuf.jpg" alt="Yusuf">
+        <div class="pfpCouple">
+          <img src="images/couple.jpg">
         </div>
       </div>
-
-      <div class="question">
-        Pasant… will you be my Valentine? 🌹
-      </div>
-
-      <div class="btns" id="btnArea">
-        <button id="yes">Yes 😌</button>
-        <button id="no">No 🙂</button>
-      </div>
-
-      <div class="yay" id="yay">
-        YAAAAY!! ❤️🎉<br/>
-        Okay now you’re officially locked in 😄<br/>
-        Text me: <b>"YES Valentine"</b>
-      </div>
-
-      <!-- Spotify embed (replace the track link in src) -->
-      <div class="spotify">
-        <iframe
-          id="spotify"
-          style="border-radius:16px"
-          src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator"
-          width="100%"
-          height="152"
-          frameBorder="0"
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy">
-        </iframe>
-      </div>
-
-      <div class="tiny">
-        Tip: If you added <b>song.mp3</b>, it’ll play when “Yes” is clicked.
-      </div>
-
-      <!-- Optional local audio (works only after user interaction) -->
-      <audio id="song" src="song.mp3" preload="auto"></audio>
     </div>
+
+    <div class="question">
+      Pasant… will you be my Valentine? 🌹
+    </div>
+
+    <div class="btns" id="btnArea">
+      <button id="yes">Yes 😌</button>
+      <button id="no">No 🙂</button>
+    </div>
+
+    <div class="yay" id="yay">
+      YAAAAY ❤️🎉<br>
+      Pasant & Yusuf — officially Valentines.
+    </div>
+
+    <div class="spotify">
+      <iframe style="border-radius:14px"
+        src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3"
+        width="100%" height="152" frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media">
+      </iframe>
+    </div>
+
+    <audio id="song" src="song.mp3"></audio>
   </div>
+</div>
 
-  <!-- Confetti library -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
-  <script>
-    /* ---------- Background slideshow logic ---------- */
-    const slides = Array.from(document.querySelectorAll(".bg-slide"));
-    let idx = 0;
+<script>
+/* BACKGROUND SLIDESHOW */
+const slides=document.querySelectorAll(".bg-slide");
+let i=0;
+setInterval(()=>{
+  slides[i].classList.remove("active");
+  i=(i+1)%slides.length;
+  slides[i].classList.add("active");
+},4500);
 
-    function showSlide(i){
-      slides.forEach((s, k) => s.style.opacity = (k === i ? "1" : "0"));
-    }
-    showSlide(idx);
+/* NO BUTTON TELEPORT */
+const no=document.getElementById("no");
+const area=document.getElementById("btnArea");
+function moveNo(){
+  const r=area.getBoundingClientRect();
+  no.style.left=Math.random()*(r.width-80)+"px";
+  no.style.top=Math.random()*(r.height-40)+"px";
+}
+no.addEventListener("mouseenter",moveNo);
+no.addEventListener("click",e=>{e.preventDefault();moveNo();});
 
-    setInterval(() => {
-      idx = (idx + 1) % slides.length;
-      showSlide(idx);
-    }, 4500); // change speed here
+/* YES BUTTON */
+const yes=document.getElementById("yes");
+const yay=document.getElementById("yay");
+const pfps=document.getElementById("pfps");
+const title=document.getElementById("title");
+const song=document.getElementById("song");
 
-    /* ---------- No button: teleport on hover/click ---------- */
-    const noBtn = document.getElementById("no");
-    const card = document.getElementById("card");
-    const btnArea = document.getElementById("btnArea");
+const confettiFire=confetti.create(document.getElementById("confetti"),{resize:true});
 
-    function teleportNo(){
-      const areaRect = btnArea.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
+yes.onclick=async()=>{
+  yay.style.display="block";
+  title.textContent="Pasant & Yusuf 💘";
+  pfps.classList.add("merged");
+  no.style.display="none";
+  yes.disabled=true;
+  yes.textContent="Locked in ✅";
 
-      // Keep inside the button area + some padding
-      const pad = 8;
-      const maxX = areaRect.width - btnRect.width - pad;
-      const maxY = areaRect.height - btnRect.height - pad;
+  confettiFire({particleCount:160,spread:80,origin:{y:.6}});
+  setTimeout(()=>confettiFire({particleCount:100,spread:120}),250);
 
-      const x = Math.max(pad, Math.random() * maxX);
-      const y = Math.max(pad, Math.random() * maxY);
+  try{ await song.play(); }catch{}
+};
+</script>
 
-      noBtn.style.left = x + "px";
-      noBtn.style.top  = y + "px";
-    }
-
-    // Make it basically unclickable
-    noBtn.addEventListener("mouseenter", teleportNo);
-    noBtn.addEventListener("mousemove", teleportNo);
-    noBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      teleportNo();
-    });
-
-    // Start it somewhere not annoying
-    setTimeout(teleportNo, 200);
-
-    /* ---------- Yes: confetti + reveal + play song ---------- */
-    const yesBtn = document.getElementById("yes");
-    const yay = document.getElementById("yay");
-    const song = document.getElementById("song");
-
-    const myConfetti = confetti.create(document.getElementById("confettiCanvas"), {
-      resize: true,
-      useWorker: true
-    });
-
-    function burst(){
-      myConfetti({ particleCount: 140, spread: 70, origin: { y: 0.65 } });
-      setTimeout(() => myConfetti({ particleCount: 90, spread: 110, origin: { y: 0.55 } }), 200);
-      setTimeout(() => myConfetti({ particleCount: 70, spread: 90, origin: { y: 0.6 } }), 420);
-    }
-
-    yesBtn.addEventListener("click", async () => {
-      yay.style.display = "block";
-      yesBtn.textContent = "Locked in ✅";
-      yesBtn.disabled = true;
-
-      // Make "No" disappear after YES
-      noBtn.style.display = "none";
-
-      // Confetti!
-      burst();
-
-      // Try to play local mp3 if it exists
-      try {
-        if (song && song.getAttribute("src")) {
-          await song.play();
-        }
-      } catch (err) {
-        // Autoplay may be blocked if file missing or browser policy
-        // No worries — Spotify embed still there.
-      }
-    });
-  </script>
 </body>
 </html>
