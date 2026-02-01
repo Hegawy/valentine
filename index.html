@@ -5,579 +5,299 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <title>Pasant & Yusuf 💘</title>
 
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
 <style>
-  :root{
-    --pink:#ff3b7a;
-    --pink2:#ff6aa2;
-    --card: rgba(255,255,255,0.92);
-    --shadow: 0 18px 60px rgba(0,0,0,0.35);
+:root{
+  --pink:#ff3b7a;
+  --pink2:#ff6aa2;
+  --card: rgba(255,255,255,0.94);
+  --shadow: 0 18px 60px rgba(0,0,0,0.35);
 
-    --cardW: min(92vw, 640px);
-    --envW:  min(92vw, 560px);
+  --sideSize: 96px;
+  --coupleW: min(78vw, 360px);
+  --coupleH: 230px;
+}
 
-    /* Side frames */
-    --sideSize: 104px;
+*{ box-sizing:border-box; }
+html,body{ height:100%; margin:0; }
+body{
+  background:#000;
+  overflow:hidden;
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
-    /* Couple frame: bigger HEIGHT */
-    --coupleW: min(76vw, 420px);
-    --coupleH: 220px;  /* taller */
-  }
+/* BACKGROUND */
+.bg{
+  position:fixed; inset:0; z-index:-3;
+  background-size:cover; background-position:center;
+  filter: blur(2px) saturate(1.1);
+  transform: scale(1.05);
+  transition: opacity 1.2s ease;
+}
+.bg::after{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255,59,122,.22), transparent 45%),
+    radial-gradient(circle at 80% 30%, rgba(255,106,162,.18), transparent 55%),
+    rgba(0,0,0,.45);
+}
 
-  *{ box-sizing:border-box; }
-  html, body{ height:100%; }
-  body{
-    margin:0;
-    background:#000;
-    overflow:hidden;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  }
+/* CONFETTI */
+#confettiCanvas{
+  position:fixed; inset:0;
+  width:100vw; height:100vh;
+  pointer-events:none;
+  z-index:9999;
+}
 
-  /* Background */
-  .bg{
-    position:fixed; inset:0; z-index:-3;
-    background-size:cover; background-position:center;
-    filter: blur(2px) saturate(1.1);
-    transform: scale(1.05);
-    transition: opacity 1.2s ease-in-out;
-    opacity: 1;
-  }
-  .bg::after{
-    content:"";
-    position:absolute; inset:0;
-    background:
-      radial-gradient(circle at 20% 10%, rgba(255,59,122,0.22), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(255,106,162,0.18), transparent 55%),
-      rgba(0,0,0,0.42);
-  }
+/* STAGE */
+.stage{
+  position:fixed;
+  inset:0;
+  padding:
+    calc(14px + env(safe-area-inset-top))
+    calc(14px + env(safe-area-inset-right))
+    calc(14px + env(safe-area-inset-bottom))
+    calc(14px + env(safe-area-inset-left));
+}
+.center{
+  position:absolute;
+  left:50%; top:50%;
+  transform:translate(-50%,-50%);
+}
 
-  /* Confetti canvas full screen */
-  #confettiCanvas{
-    position:fixed; inset:0;
-    width:100vw; height:100vh;
-    pointer-events:none;
-    z-index:9999;
-  }
+/* ENVELOPE */
+.envelope{
+  width:min(92vw,560px);
+  height:min(64vh,380px);
+  border-radius:28px;
+  background:rgba(255,255,255,.95);
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+.envFlap{
+  position:absolute; top:0; left:0; right:0;
+  height:58%;
+  background:linear-gradient(135deg, rgba(255,59,122,.14), rgba(255,106,162,.1));
+  clip-path: polygon(0 0,100% 0,50% 82%);
+  transform-origin:top;
+  transition:.9s cubic-bezier(.2,.85,.2,1);
+}
+.seal{
+  position:absolute;
+  left:50%; bottom:52px;
+  transform:translateX(-50%);
+  width:66px; height:66px;
+  background:linear-gradient(135deg,var(--pink),var(--pink2));
+  border-radius:18px;
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:900;
+  box-shadow:0 18px 34px rgba(255,59,122,.3);
+}
+.letter{
+  position:absolute;
+  left:50%; bottom:16px;
+  transform:translateX(-50%);
+  width:90%; height:76%;
+  background:#fff;
+  border-radius:22px;
+  box-shadow:0 14px 30px rgba(0,0,0,.18);
+  display:flex; align-items:center; justify-content:center;
+  text-align:center;
+  transition:.9s cubic-bezier(.2,.85,.2,1);
+}
+.openBtn{
+  margin-top:10px;
+  padding:12px 20px;
+  border-radius:16px;
+  border:none;
+  background:linear-gradient(135deg,var(--pink),var(--pink2));
+  color:#fff;
+  font-weight:900;
+}
 
-  /* Stage: we will ABSOLUTELY center screens, not flex them */
-  .stage{
-    position:fixed;
-    inset:0;
-    padding:
-      calc(14px + env(safe-area-inset-top))
-      calc(14px + env(safe-area-inset-right))
-      calc(14px + env(safe-area-inset-bottom))
-      calc(14px + env(safe-area-inset-left));
-  }
+/* OPEN STATE */
+.opened .envFlap{ transform:rotateX(180deg); }
+.opened .letter{ transform:translateX(-50%) translateY(-190px) scale(1.04); }
+.hidden{ display:none; }
 
-  /* Center wrapper so screens don’t push each other horizontally */
-  .centerScreen{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform: translate(-50%, -50%);
-    width: min(92vw, 680px);
-  }
+/* CARD */
+.card{
+  width:min(92vw,640px);
+  max-height:88vh;
+  overflow:auto;
+  background:var(--card);
+  border-radius:28px;
+  padding:18px;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
 
-  /* ------------------ ENVELOPE ------------------ */
-  .envelopeWrap{
-    width: var(--envW);
-    margin: 0 auto;
-    transition: opacity .55s ease, transform .55s ease;
-  }
+/* PHOTOS */
+.topPhotos{
+  position:relative;
+  height:calc(var(--coupleH) + 18px);
+}
+.pfp{
+  width:var(--sideSize);
+  height:var(--sideSize);
+  border-radius:26px;
+  overflow:hidden;
+  position:absolute; top:0;
+  box-shadow:0 18px 34px rgba(0,0,0,.22);
+}
+.pfp img, .couple img{ width:100%; height:100%; object-fit:cover; }
+#p1{ left:0; }
+#p2{ right:0; }
 
-  .envelope{
-    width: var(--envW);
-    height: min(64vh, 380px);
-    position:relative;
-    border-radius: 28px;
-    box-shadow: var(--shadow);
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(10px);
-    overflow:hidden;
-    border: 1px solid rgba(255,255,255,0.55);
-    transform: translateZ(0);
-  }
+.couple{
+  position:absolute;
+  left:50%; top:0;
+  transform:translateX(-50%) scale(.82);
+  width:var(--coupleW);
+  height:var(--coupleH);
+  border-radius:30px;
+  overflow:hidden;
+  opacity:0;
+  transition:.5s ease;
+}
+.merged .pfp{ opacity:0; }
+.merged .couple{ opacity:1; transform:translateX(-50%) scale(1); }
 
-  .envelopeGlow{
-    position:absolute; inset:-2px;
-    background:
-      radial-gradient(circle at 30% 20%, rgba(255,59,122,0.38), transparent 45%),
-      radial-gradient(circle at 80% 70%, rgba(255,106,162,0.25), transparent 55%);
-    opacity:0.55;
-    filter: blur(10px);
-    pointer-events:none;
-  }
+/* BUTTONS */
+.btnRow{
+  position:relative;
+  height:82px;
+  margin-top:10px;
+}
+#yes{
+  padding:14px 22px;
+  border-radius:18px;
+  background:linear-gradient(135deg,var(--pink),var(--pink2));
+  color:#fff;
+  font-weight:900;
+}
+#no{
+  position:absolute;
+  padding:10px 14px;
+  border-radius:14px;
+  background:#111;
+  color:#fff;
+}
 
-  .envBase{ position:absolute; inset:0; background: rgba(255,255,255,0.92); }
-  .envFlap{
-    position:absolute; left:0; right:0; top:0;
-    height: 58%;
-    background: linear-gradient(135deg, rgba(255,59,122,0.14), rgba(255,106,162,0.10));
-    clip-path: polygon(0 0, 100% 0, 50% 82%);
-    transform-origin: top;
-    transition: transform .9s cubic-bezier(.2,.85,.2,1);
-    border-bottom: 1px solid rgba(0,0,0,0.06);
-  }
-  .envFoldL,.envFoldR{
-    position:absolute; bottom:0;
-    width:55%; height:62%;
-    background: rgba(0,0,0,0.02);
-  }
-  .envFoldL{ left:-5%; clip-path: polygon(0 100%, 100% 100%, 55% 0); }
-  .envFoldR{ right:-5%; clip-path: polygon(0 100%, 100% 100%, 45% 0); }
-
-  .seal{
-    position:absolute;
-    left:50%;
-    bottom: 52px;
-    transform: translateX(-50%);
-    width: 66px; height: 66px;
-    border-radius: 18px;
-    display:flex; align-items:center; justify-content:center;
-    color:#fff; font-weight:900;
-    background: linear-gradient(135deg, var(--pink), var(--pink2));
-    box-shadow: 0 18px 34px rgba(255,59,122,0.28);
-    user-select:none;
-  }
-  .seal span{ letter-spacing:1px; }
-
-  .letter{
-    position:absolute;
-    left:50%;
-    bottom: 16px;
-    transform: translateX(-50%);
-    width: 90%;
-    height: 76%;
-    border-radius: 22px;
-    background: rgba(255,255,255,0.96);
-    box-shadow: 0 14px 30px rgba(0,0,0,0.18);
-    border: 1px solid rgba(0,0,0,0.06);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding: 18px;
-    transition: transform .9s cubic-bezier(.2,.85,.2,1), opacity .6s ease;
-  }
-
-  .openMe{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-  }
-  .openTitle{ margin:0; font-size: 28px; }
-  .openSub{ margin:0; opacity:.85; font-size: 14px; }
-  .tapHint{ font-size:12px; opacity:.7; }
-
-  .openBtn{
-    margin-top: 8px;
-    border:0;
-    padding: 12px 18px;
-    border-radius: 16px;
-    cursor:pointer;
-    color:#fff;
-    font-weight:900;
-    background: linear-gradient(135deg, var(--pink), var(--pink2));
-    box-shadow: 0 16px 30px rgba(255,59,122,0.28);
-  }
-
-  .envelope.idle{ animation: floaty 2.6s ease-in-out infinite; }
-  @keyframes floaty{ 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-6px);} }
-
-  .opened .envFlap{ transform: rotateX(180deg); }
-  .opened .letter{ transform: translateX(-50%) translateY(-190px) scale(1.04); }
-  .opened .seal{ opacity:0; transform: translateX(-50%) scale(0.85); transition:.35s ease; }
-
-  .hideEnvelope{
-    opacity:0;
-    transform: translateY(16px) scale(0.98);
-    pointer-events:none;
-  }
-
-  /* ------------------ CARD ------------------ */
-  .card{
-    width: var(--cardW);
-    margin: 0 auto;
-
-    background: var(--card);
-    border-radius: 28px;
-    box-shadow: var(--shadow);
-    padding: 18px 16px 16px;
-    border: 1px solid rgba(255,255,255,0.55);
-    backdrop-filter: blur(10px);
-
-    /* IMPORTANT: keep it inside iPhone screen */
-    max-height: 88vh;
-    overflow:auto;
-    -webkit-overflow-scrolling: touch;
-
-    opacity:0;
-    transform: translateY(18px) scale(0.98);
-    pointer-events:none;
-    transition: opacity .65s ease, transform .65s ease;
-  }
-  .card.show{
-    opacity:1;
-    transform: translateY(0) scale(1);
-    pointer-events:auto;
-  }
-
-  .topPhotos{
-    position:relative;
-    height: calc(var(--coupleH) + 18px);
-    margin-bottom: 6px;
-  }
-
-  .pfpFrame{
-    width: var(--sideSize);
-    height: var(--sideSize);
-    border-radius: 26px;
-    overflow:hidden;
-    border: 3px solid rgba(255,255,255,0.92);
-    box-shadow: 0 18px 34px rgba(0,0,0,0.22);
-    background:#ddd;
-    position:absolute;
-    top: 0;
-  }
-  .pfpFrame img{ width:100%; height:100%; object-fit:cover; display:block; }
-  #pasantFrame{ left:0; }
-  #yusufFrame{ right:0; }
-
-  /* Taller couple frame */
-  .coupleFrame{
-    position:absolute;
-    left:50%; top:0;
-    transform: translateX(-50%) scale(0.82);
-    width: var(--coupleW);
-    height: var(--coupleH);
-    border-radius: 30px;
-    overflow:hidden;
-    border: 3px solid rgba(255,255,255,0.94);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.24);
-    opacity:0;
-    filter: blur(2px);
-    transition: opacity .55s ease, transform .55s ease, filter .55s ease;
-    background:#ddd;
-  }
-  .coupleFrame img{ width:100%; height:100%; object-fit:cover; display:block; }
-
-  .merged #pasantFrame,
-  .merged #yusufFrame{
-    opacity:0;
-    transform: scale(0.65) translateY(10px);
-    filter: blur(2px);
-    pointer-events:none;
-  }
-  .merged #coupleFrame{
-    opacity:1;
-    filter: blur(0);
-    transform: translateX(-50%) scale(1);
-  }
-
-  h1{
-    margin: 8px 0 0;
-    font-size: clamp(22px, 5.8vw, 30px);
-    line-height: 1.15;
-    letter-spacing:-0.2px;
-    text-align:center;
-  }
-  .sub{
-    margin: 8px 0 0;
-    opacity:.78;
-    font-size:14px;
-    text-align:center;
-  }
-  .question{
-    margin: 12px 0 14px;
-    font-size: 17px;
-    opacity:.92;
-    text-align:center;
-  }
-
-  .btnRow{
-    position:relative;
-    height: 82px;
-    margin-top: 4px;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-  }
-
-  .btn{
-    border:0;
-    padding: 14px 22px;
-    border-radius: 18px;
-    font-size: 16px;
-    cursor:pointer;
-    user-select:none;
-  }
-
-  #yes{
-    background: linear-gradient(135deg, var(--pink), var(--pink2));
-    color:#fff;
-    font-weight: 900;
-    box-shadow: 0 16px 32px rgba(255,59,122,0.28);
-  }
-  #yes.pulsing{ animation: pulse 1.35s ease-in-out infinite; }
-  @keyframes pulse{
-    0%,100%{ transform: translateY(0) scale(1); }
-    50%{ transform: translateY(-1px) scale(1.03); }
-  }
-
-  /* NO button must remain small */
-  #no{
-    position:absolute;
-    padding: 10px 14px;
-    border-radius: 14px;
-    font-size: 14px;
-    background: #15151a;
-    color:#fff;
-    box-shadow: 0 14px 26px rgba(0,0,0,0.25);
-    width:auto;
-    transform:none !important;
-  }
-
-  .yay{
-    display:none;
-    margin-top: 12px;
-    padding: 14px;
-    border-radius: 18px;
-    background: rgba(255, 235, 243, 0.92);
-    border: 1px solid rgba(255, 59, 122, 0.22);
-    font-size: 16px;
-    line-height: 1.45;
-    text-align:center;
-  }
-
-  .spotify{
-    margin-top: 12px;
-    border-radius: 16px;
-    overflow:hidden;
-    border: 1px solid rgba(0,0,0,0.08);
-  }
-
-  .tiny{
-    margin-top:10px;
-    font-size:12px;
-    opacity:.75;
-    text-align:center;
-  }
-
-  /* iPhone tuning: keep side frames from colliding */
-  @media (max-width: 430px){
-    :root{
-      --sideSize: 96px;
-      --coupleW: min(78vw, 360px);
-      --coupleH: 230px; /* taller on iPhone */
-    }
-  }
+/* TEXT */
+h1{ margin-top:10px; }
+.valentineMsg{
+  margin-top:14px;
+  padding:14px;
+  border-radius:18px;
+  background:rgba(255,230,240,.9);
+}
 </style>
 </head>
 
 <body>
-  <div class="bg" id="bg"></div>
-  <canvas id="confettiCanvas"></canvas>
+<div class="bg" id="bg"></div>
+<canvas id="confettiCanvas"></canvas>
 
-  <div class="stage">
+<div class="stage">
 
-    <!-- Envelope Screen (centered, not affecting layout of card) -->
-    <div class="centerScreen" id="envelopeScreen">
-      <div class="envelopeWrap" id="envelopeWrap">
-        <div class="envelope idle" id="envelope">
-          <div class="envelopeGlow"></div>
-          <div class="envBase"></div>
-          <div class="envFlap"></div>
-          <div class="envFoldL"></div>
-          <div class="envFoldR"></div>
-
-          <div class="seal" id="seal"><span>P + Y</span></div>
-
-          <div class="letter" id="letter">
-            <div class="openMe">
-              <h2 class="openTitle">💌 Open me</h2>
-              <p class="openSub">A message for <b>Pasant</b> from <b>Yusuf</b></p>
-              <div class="tapHint">Tap anywhere to open</div>
-              <button class="openBtn" id="openBtn">Open</button>
-            </div>
-          </div>
+  <!-- ENVELOPE -->
+  <div class="center" id="envScreen">
+    <div class="envelope" id="env">
+      <div class="envFlap"></div>
+      <div class="seal">P + Y</div>
+      <div class="letter">
+        <div>
+          <h2>💌 Open me</h2>
+          <p>A message for <b>Pasant</b> from <b>Yusuf</b></p>
+          <button class="openBtn" id="openBtn">Open</button>
         </div>
       </div>
     </div>
-
-    <!-- Card Screen (centered) -->
-    <div class="centerScreen" id="cardScreen" style="display:none;">
-      <div class="card" id="card">
-        <div class="topPhotos" id="topPhotos">
-          <div class="pfpFrame" id="pasantFrame">
-            <img src="images/pasant1.jpeg" alt="Pasant">
-          </div>
-          <div class="pfpFrame" id="yusufFrame">
-            <img src="images/yusuf1.jpeg" alt="Yusuf">
-          </div>
-
-          <div class="coupleFrame" id="coupleFrame">
-            <img src="images/couple.jpeg" alt="Pasant and Yusuf">
-          </div>
-        </div>
-
-        <h1 id="title">Will you be my Valentine? 💘</h1>
-        <div class="sub">Pasant… there is only one correct answer 😌</div>
-        <div class="question">Will you be my Valentine, Pasant? 🌹</div>
-
-        <div class="btnRow" id="btnRow">
-          <button class="btn pulsing" id="yes">Yes 😌</button>
-          <button class="btn" id="no">No 🙂</button>
-        </div>
-
-        <div class="yay" id="yay">
-          YAAAAY!! ❤️🎉<br/>
-          <b>Pasant & Yusuf</b> — officially Valentines.
-        </div>
-
-        <div class="spotify">
-          <iframe
-            style="border-radius:16px"
-            src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator"
-            width="100%"
-            height="152"
-            frameBorder="0"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy"></iframe>
-        </div>
-
-        <div class="tiny">
-          Optional: add <b>song.mp3</b> in repo root to play audio after clicking “Yes”.
-        </div>
-
-        <audio id="song" src="song.mp3" preload="auto"></audio>
-      </div>
-    </div>
-
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-  <script>
-    /* Background slideshow */
-    const bg = document.getElementById("bg");
-    const bgImages = ["images/bg1.jpeg","images/bg2.jpeg","images/bg3.jpeg","images/bg4.jpeg"];
-    let bgIndex = 0;
-    function setBg(i){
-      bg.style.opacity = "0";
-      setTimeout(() => {
-        bg.style.backgroundImage = `url('${bgImages[i]}')`;
-        bg.style.opacity = "1";
-      }, 450);
-    }
-    setBg(bgIndex);
-    setInterval(() => { bgIndex = (bgIndex + 1) % bgImages.length; setBg(bgIndex); }, 4500);
+  <!-- CARD -->
+  <div class="center hidden" id="cardScreen">
+    <div class="card" id="card">
+      <div class="topPhotos" id="photos">
+        <div class="pfp" id="p1"><img src="images/pasant1.jpeg"></div>
+        <div class="pfp" id="p2"><img src="images/yusuf1.jpeg"></div>
+        <div class="couple" id="couple"><img src="images/couple.jpeg"></div>
+      </div>
 
-    /* Confetti canvas sizing FIX */
-    const canvas = document.getElementById("confettiCanvas");
-    function resizeCanvas(){
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(window.innerWidth * dpr);
-      canvas.height = Math.floor(window.innerHeight * dpr);
-      canvas.style.width = window.innerWidth + "px";
-      canvas.style.height = window.innerHeight + "px";
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+      <h1 id="title">Will you be my Valentine? 💘</h1>
+      <p>There’s only one correct answer 😌</p>
 
-    const myConfetti = confetti.create(canvas, { resize:false, useWorker:true });
-    function fullPageConfetti(seconds=2.6){
-      const end = Date.now() + seconds*1000;
-      (function frame(){
-        myConfetti({
-          particleCount: 32,
-          spread: 150,
-          startVelocity: 38,
-          scalar: 1.05,
-          origin: { x: Math.random(), y: Math.random()*0.95 }
-        });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      })();
-    }
+      <div class="btnRow" id="row">
+        <button id="yes">Yes 😌</button>
+        <button id="no">No 🙂</button>
+      </div>
 
-    /* Screens */
-    const envelope = document.getElementById("envelope");
-    const envelopeWrap = document.getElementById("envelopeWrap");
-    const envelopeScreen = document.getElementById("envelopeScreen");
+      <div class="valentineMsg" id="msg" style="display:none">
+        💖 <b>Pasant & Yusuf</b> 💖<br><br>
+        Two hearts. One story.<br>
+        One Valentine — forever. 🌹
+      </div>
+    </div>
+  </div>
 
-    const cardScreen = document.getElementById("cardScreen");
-    const card = document.getElementById("card");
+</div>
 
-    const openBtn = document.getElementById("openBtn");
-    let opened=false;
+<audio id="noSound" src="no.mp3" preload="auto"></audio>
 
-    function openEnvelope(){
-      if(opened) return;
-      opened=true;
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script>
+/* BACKGROUND */
+const bg=document.getElementById("bg");
+const imgs=["images/bg1.jpeg","images/bg2.jpeg","images/bg3.jpeg","images/bg4.jpeg"];
+let i=0;
+setInterval(()=>{bg.style.backgroundImage=`url(${imgs[i++%imgs.length]})`;},4500);
+bg.style.backgroundImage=`url(${imgs[0]})`;
 
-      envelope.classList.add("opened");
+/* CONFETTI */
+const canvas=document.getElementById("confettiCanvas");
+const dpr=window.devicePixelRatio||1;
+canvas.width=innerWidth*dpr;
+canvas.height=innerHeight*dpr;
+const conf=confetti.create(canvas,{resize:true});
 
-      setTimeout(()=>{
-        envelopeWrap.classList.add("hideEnvelope");
-      }, 650);
+/* OPEN */
+openBtn.onclick=()=>{
+  env.classList.add("opened");
+  setTimeout(()=>{
+    envScreen.classList.add("hidden");
+    cardScreen.classList.remove("hidden");
+  },900);
+};
 
-      setTimeout(()=>{
-        envelopeScreen.style.display = "none";
-        cardScreen.style.display = "block";
-        // allow animation
-        requestAnimationFrame(()=> card.classList.add("show"));
-      }, 950);
-    }
+/* NO BUTTON */
+const no=document.getElementById("no");
+const row=document.getElementById("row");
+const snd=document.getElementById("noSound");
 
-    openBtn.addEventListener("click", openEnvelope);
-    envelope.addEventListener("click", (e)=>{
-      if(e.target && e.target.id==="openBtn") return;
-      openEnvelope();
-    });
+function moveNo(){
+  snd.currentTime=0; snd.play();
+  const r=row.getBoundingClientRect();
+  no.style.left=Math.random()*(r.width-60)+"px";
+  no.style.top=Math.random()*(r.height-30)+"px";
+}
+no.onclick=e=>{e.preventDefault();moveNo();}
+no.ontouchstart=e=>{e.preventDefault();moveNo();}
 
-    /* NO button: works on iPhone (touch) */
-    const noBtn = document.getElementById("no");
-    const btnRow = document.getElementById("btnRow");
-    noBtn.style.position = "absolute";
-
-    function teleportNo(instant=false){
-      const rowRect = btnRow.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
-      const pad = 8;
-
-      const maxX = Math.max(0, rowRect.width - btnRect.width - pad);
-      const maxY = Math.max(0, rowRect.height - btnRect.height - pad);
-
-      noBtn.style.transition = instant ? "left 0.06s linear, top 0.06s linear" : "left 0.14s ease, top 0.14s ease";
-      noBtn.style.left = (pad + Math.random()*maxX) + "px";
-      noBtn.style.top  = (pad + Math.random()*maxY) + "px";
-    }
-    setTimeout(()=>teleportNo(false), 200);
-
-    noBtn.addEventListener("click", (e)=>{ e.preventDefault(); teleportNo(true); });
-    noBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); teleportNo(true); }, {passive:false});
-
-    /* YES action */
-    const yesBtn = document.getElementById("yes");
-    const yay = document.getElementById("yay");
-    const title = document.getElementById("title");
-    const topPhotos = document.getElementById("topPhotos");
-    const song = document.getElementById("song");
-
-    yesBtn.addEventListener("click", async ()=>{
-      yay.style.display="block";
-      title.textContent="Pasant & Yusuf 💘";
-      topPhotos.classList.add("merged");
-      yesBtn.classList.remove("pulsing");
-      yesBtn.textContent="Locked in ✅";
-      yesBtn.disabled=true;
-      noBtn.style.display="none";
-
-      fullPageConfetti(2.8);
-
-      try{ await song.play(); }catch(e){}
-    });
-  </script>
+/* YES */
+yes.onclick=()=>{
+  photos.classList.add("merged");
+  msg.style.display="block";
+  title.innerText="Pasant & Yusuf 💘";
+  no.style.display="none";
+  conf({particleCount:200,spread:160});
+};
+</script>
 </body>
 </html>
