@@ -9,7 +9,6 @@
   :root{
     --pink:#ff3b7a;
     --pink2:#ff6aa2;
-    --dark:#0f0f12;
     --card: rgba(255,255,255,0.92);
     --shadow: 0 18px 60px rgba(0,0,0,0.35);
   }
@@ -22,7 +21,7 @@
     color:#111;
   }
 
-  /* ===== Background slideshow (single layer, reliable) ===== */
+  /* ===== Background slideshow ===== */
   .bg{
     position:fixed; inset:0; z-index:-3;
     background-size:cover; background-position:center;
@@ -43,11 +42,12 @@
   /* Full page confetti canvas */
   #confettiCanvas{
     position:fixed; inset:0;
+    width:100vw; height:100vh;
     pointer-events:none;
     z-index:9999;
   }
 
-  /* ===== Stage layout ===== */
+  /* ===== Stage layout (center everything) ===== */
   .stage{
     height:100%;
     display:flex;
@@ -60,21 +60,41 @@
      ENVELOPE INTRO
   ========================== */
   .envelopeWrap{
-    width:min(560px, 94vw);
+    width:min(600px, 94vw);
     display:flex;
-    justify-content:center;
+    align-items:center;
+    justify-content:center; /* center envelope */
+    transition: opacity .55s ease, transform .55s ease;
   }
 
   .envelope{
-    width:min(520px, 94vw);
-    height: 340px;
+    width:min(560px, 94vw);
+    height: 360px;
     position:relative;
-    border-radius: 28px;
+    border-radius: 30px;
     box-shadow: var(--shadow);
     background: rgba(255,255,255,0.92);
     backdrop-filter: blur(10px);
     overflow:hidden;
     border: 1px solid rgba(255,255,255,0.55);
+    transform: translateZ(0);
+  }
+
+  /* Cute subtle bounce + glow */
+  .envelopeGlow{
+    position:absolute; inset:-2px;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,59,122,0.38), transparent 45%),
+      radial-gradient(circle at 80% 70%, rgba(255,106,162,0.25), transparent 55%);
+    opacity:0.55;
+    filter: blur(10px);
+    z-index:0;
+    pointer-events:none;
+  }
+
+  .envelopeInner{
+    position:absolute; inset:0;
+    z-index:1;
   }
 
   /* Envelope base */
@@ -92,7 +112,7 @@
     left:0; right:0;
     top:0;
     height: 58%;
-    background: linear-gradient(135deg, rgba(255,59,122,0.12), rgba(255,106,162,0.08));
+    background: linear-gradient(135deg, rgba(255,59,122,0.14), rgba(255,106,162,0.10));
     clip-path: polygon(0 0, 100% 0, 50% 82%);
     transform-origin: top;
     transition: transform .9s cubic-bezier(.2,.85,.2,1);
@@ -106,7 +126,6 @@
     width:55%;
     height:62%;
     background: rgba(0,0,0,0.02);
-    filter: blur(0.0px);
   }
   .envFoldL{
     left:-5%;
@@ -119,16 +138,51 @@
     border-top: 1px solid rgba(0,0,0,0.05);
   }
 
+  /* Heart seal */
+  .seal{
+    position:absolute;
+    left:50%;
+    bottom: 52px;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    border-radius: 18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-weight:900;
+    background: linear-gradient(135deg, var(--pink), var(--pink2));
+    box-shadow: 0 18px 34px rgba(255,59,122,0.28);
+    z-index:3;
+    user-select:none;
+  }
+  .seal::before{
+    content:"";
+    width: 34px;
+    height: 34px;
+    background: rgba(255,255,255,0.22);
+    border-radius: 10px;
+    position:absolute;
+    transform: rotate(18deg);
+    opacity:.9;
+  }
+  .seal span{
+    position:relative;
+    z-index:2;
+    letter-spacing: 1px;
+  }
+
   /* Letter card inside envelope */
   .letter{
     position:absolute;
     left:50%;
     bottom: 18px;
     transform: translateX(-50%);
-    width: 86%;
-    height: 72%;
+    width: 88%;
+    height: 74%;
     border-radius: 22px;
-    background: rgba(255,255,255,0.95);
+    background: rgba(255,255,255,0.96);
     box-shadow: 0 14px 30px rgba(0,0,0,0.18);
     border: 1px solid rgba(0,0,0,0.06);
     display:flex;
@@ -144,10 +198,12 @@
     flex-direction:column;
     gap:10px;
     align-items:center;
+    justify-content:center;
+    width:100%;
   }
 
   .openTitle{
-    font-size: 26px;
+    font-size: 28px;
     margin:0;
     letter-spacing:-0.2px;
   }
@@ -156,34 +212,72 @@
     opacity:.8;
     font-size: 14px;
   }
+
+  /* Tap hint */
+  .tapHint{
+    margin-top: 2px;
+    font-size: 12px;
+    opacity: .7;
+  }
+
   .openBtn{
-    margin-top: 6px;
+    margin-top: 8px;
     border:0;
     padding: 12px 18px;
     border-radius: 16px;
     cursor:pointer;
     color:#fff;
-    font-weight:800;
+    font-weight:900;
     background: linear-gradient(135deg, var(--pink), var(--pink2));
     box-shadow: 0 16px 30px rgba(255,59,122,0.28);
     transition: transform .15s ease, filter .15s ease;
+    position:relative;
+    overflow:hidden;
   }
-  .openBtn:hover{ transform: translateY(-2px) scale(1.02); filter: brightness(1.03); }
+  .openBtn::after{
+    content:"";
+    position:absolute;
+    top:-35%;
+    left:-70%;
+    width:60%;
+    height:180%;
+    background: rgba(255,255,255,0.22);
+    transform: rotate(18deg);
+    transition: left .6s ease;
+  }
+  .openBtn:hover{
+    transform: translateY(-2px) scale(1.02);
+    filter: brightness(1.03);
+  }
+  .openBtn:hover::after{ left:130%; }
   .openBtn:active{ transform: translateY(0) scale(0.99); }
 
-  /* Opening animation state */
-  .opened .envFlap{
-    transform: rotateX(180deg);
+  /* Envelope idle animation */
+  .envelope.idle{
+    animation: floaty 2.6s ease-in-out infinite;
   }
-  .opened .letter{
-    transform: translateX(-50%) translateY(-180px) scale(1.03);
+  @keyframes floaty{
+    0%,100%{ transform: translateY(0); }
+    50%{ transform: translateY(-6px); }
   }
 
-  /* Fade envelope away and reveal main card */
+  /* Envelope wiggle on hover */
+  .envelope:hover{
+    animation: wiggle 0.22s ease-in-out infinite;
+  }
+  @keyframes wiggle{
+    0%,100%{ transform: rotate(0deg); }
+    50%{ transform: rotate(-0.6deg); }
+  }
+
+  /* Opening animation state */
+  .opened .envFlap{ transform: rotateX(180deg); }
+  .opened .letter{ transform: translateX(-50%) translateY(-190px) scale(1.04); }
+  .opened .seal{ opacity:0; transform: translateX(-50%) scale(0.85); transition: .35s ease; }
+
   .hideEnvelope{
     opacity:0;
     transform: translateY(16px) scale(0.98);
-    transition: opacity .55s ease, transform .55s ease;
     pointer-events:none;
   }
 
@@ -191,7 +285,7 @@
      MAIN VALENTINE CARD
   ========================== */
   .card{
-    width:min(600px, 94vw);
+    width:min(640px, 94vw);
     background: var(--card);
     border-radius: 28px;
     box-shadow: var(--shadow);
@@ -205,14 +299,11 @@
     pointer-events:none;
     transition: opacity .65s ease, transform .65s ease;
   }
-
   .card.show{
     opacity:1;
     transform: translateY(0) scale(1);
     pointer-events:auto;
   }
-
-  /* soft glow */
   .card::before{
     content:"";
     position:absolute; inset:-2px;
@@ -227,14 +318,13 @@
   /* Bigger top photo container */
   .topPhotos{
     position:relative;
-    height: 170px;
+    height: 190px;
     margin-bottom: 10px;
   }
-
   .pfpFrame{
-    width: 140px;
-    height: 140px;
-    border-radius: 28px;
+    width: 155px;
+    height: 155px;
+    border-radius: 30px;
     overflow:hidden;
     border: 3px solid rgba(255,255,255,0.92);
     box-shadow: 0 18px 34px rgba(0,0,0,0.22);
@@ -244,10 +334,8 @@
     transition: transform .35s ease, filter .35s ease, opacity .35s ease;
   }
   .pfpFrame img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
+    width:100%; height:100%;
+    object-fit:cover; display:block;
   }
   #pasantFrame{ left:0; }
   #yusufFrame{ right:0; }
@@ -258,9 +346,9 @@
     left:50%;
     top:0;
     transform: translateX(-50%) scale(0.82);
-    width: 340px;
-    height: 140px;
-    border-radius: 32px;
+    width: 380px;
+    height: 155px;
+    border-radius: 34px;
     overflow:hidden;
     border: 3px solid rgba(255,255,255,0.94);
     box-shadow: 0 20px 40px rgba(0,0,0,0.24);
@@ -270,13 +358,10 @@
     background:#ddd;
   }
   .coupleFrame img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
+    width:100%; height:100%;
+    object-fit:cover; display:block;
   }
 
-  /* merge state */
   .merged #pasantFrame,
   .merged #yusufFrame{
     opacity:0;
@@ -300,24 +385,29 @@
     margin: 8px 0 0;
     font-size: 30px;
     line-height: 1.15;
-    letter-spacing: -0.2px;
+    letter-spacing:-0.2px;
+    text-align:center;
   }
   .sub{
     margin: 8px 0 0;
     opacity:.78;
     font-size:14px;
+    text-align:center;
   }
   .question{
     margin: 14px 0 16px;
     font-size: 18px;
     opacity:.92;
+    text-align:center;
   }
 
-  /* Buttons row */
   .btnRow{
     position:relative;
-    height: 78px;
+    height: 82px;
     margin-top: 6px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
   }
 
   .btn{
@@ -332,7 +422,6 @@
   }
   .btn:active{ transform: translateY(1px) scale(0.99); }
 
-  /* YES button lively */
   #yes{
     background: linear-gradient(135deg, var(--pink), var(--pink2));
     color:#fff;
@@ -358,32 +447,25 @@
     box-shadow: 0 20px 42px rgba(255,59,122,0.33);
   }
   #yes:hover::after{ left:125%; }
-
   #yes.pulsing{ animation: pulse 1.35s ease-in-out infinite; }
   @keyframes pulse{
     0%,100%{ transform: translateY(0) scale(1); }
     50%{ transform: translateY(-1px) scale(1.03); }
   }
 
-  /* NO button: must stay SMALL and NOT resize */
+  /* NO button: small & fixed size */
   #no{
     position:absolute;
-    top: 8px;
-    left: 360px; /* gets overridden by JS anyway */
-    padding: 10px 14px;          /* smaller than YES */
+    padding: 10px 14px;      /* small */
     border-radius: 14px;
     font-size: 14px;
     background: #15151a;
     color:#fff;
     box-shadow: 0 14px 26px rgba(0,0,0,0.25);
-    width: auto;                 /* keep natural small size */
-    transform: none !important;  /* never scale */
-  }
-  #no:hover{
-    filter: brightness(1.05);
+    width: auto;
+    transform: none !important;
   }
 
-  /* result box */
   .yay{
     display:none;
     margin-top: 14px;
@@ -393,6 +475,7 @@
     border: 1px solid rgba(255, 59, 122, 0.22);
     font-size: 16px;
     line-height: 1.45;
+    text-align:center;
   }
 
   .spotify{
@@ -401,7 +484,6 @@
     overflow:hidden;
     border: 1px solid rgba(0,0,0,0.08);
   }
-
   .tiny{
     margin-top:10px;
     font-size:12px;
@@ -416,19 +498,27 @@
   <canvas id="confettiCanvas"></canvas>
 
   <div class="stage">
-    <!-- ENVELOPE INTRO -->
-    <div class="envelopeWrap" id="envelopeWrap">
-      <div class="envelope" id="envelope">
-        <div class="envBase"></div>
-        <div class="envFlap"></div>
-        <div class="envFoldL"></div>
-        <div class="envFoldR"></div>
 
-        <div class="letter" id="letter">
-          <div class="openMe">
-            <h2 class="openTitle">💌 Open me</h2>
-            <p class="openSub">A message for <b>Pasant</b> from <b>Yusuf</b></p>
-            <button class="openBtn" id="openBtn">Open</button>
+    <!-- ENVELOPE -->
+    <div class="envelopeWrap" id="envelopeWrap">
+      <div class="envelope idle" id="envelope">
+        <div class="envelopeGlow"></div>
+
+        <div class="envelopeInner">
+          <div class="envBase"></div>
+          <div class="envFlap"></div>
+          <div class="envFoldL"></div>
+          <div class="envFoldR"></div>
+
+          <div class="seal" id="seal"><span>P + Y</span></div>
+
+          <div class="letter" id="letter">
+            <div class="openMe">
+              <h2 class="openTitle">💌 Open me</h2>
+              <p class="openSub">A message for <b>Pasant</b> from <b>Yusuf</b></p>
+              <div class="tapHint">Tap to open</div>
+              <button class="openBtn" id="openBtn">Open</button>
+            </div>
           </div>
         </div>
       </div>
@@ -451,7 +541,6 @@
 
       <h1 id="title">Will you be my Valentine? 💘</h1>
       <div class="sub">Pasant… there is only one correct answer 😌</div>
-
       <div class="question">Will you be my Valentine, Pasant? 🌹</div>
 
       <div class="btnRow" id="btnRow">
@@ -489,12 +578,7 @@
   <script>
     /* ===== Background slideshow ===== */
     const bg = document.getElementById("bg");
-    const bgImages = [
-      "images/bg1.jpeg",
-      "images/bg2.jpeg",
-      "images/bg3.jpeg",
-      "images/bg4.jpeg"
-    ];
+    const bgImages = ["images/bg1.jpeg","images/bg2.jpeg","images/bg3.jpeg","images/bg4.jpeg"];
     let bgIndex = 0;
 
     function setBg(i){
@@ -510,23 +594,30 @@
       setBg(bgIndex);
     }, 4500);
 
-    /* ===== Confetti full-page (bursts everywhere) ===== */
-    const myConfetti = confetti.create(document.getElementById("confettiCanvas"), {
-      resize: true,
-      useWorker: true
-    });
+    /* ===== Confetti: FIXED full-page canvas sizing ===== */
+    const canvas = document.getElementById("confettiCanvas");
+    function resizeCanvas(){
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
-    function fullPageConfetti(seconds = 2.2){
+    const myConfetti = confetti.create(canvas, { resize: false, useWorker: true });
+
+    function fullPageConfetti(seconds = 2.6){
       const end = Date.now() + seconds * 1000;
 
       (function frame(){
-        // random bursts across the whole screen
         myConfetti({
-          particleCount: 28,
-          spread: 120,
-          startVelocity: 35,
-          scalar: 1.0,
-          origin: { x: Math.random(), y: Math.random() * 0.9 }
+          particleCount: 30,
+          spread: 140,
+          startVelocity: 38,
+          scalar: 1.05,
+          origin: { x: Math.random(), y: Math.random() * 0.95 }
         });
         if (Date.now() < end) requestAnimationFrame(frame);
       })();
@@ -538,65 +629,65 @@
     const envelopeWrap = document.getElementById("envelopeWrap");
     const card = document.getElementById("card");
 
-    openBtn.addEventListener("click", () => {
+    function openEnvelope(){
       envelope.classList.add("opened");
-
       // after flap open + letter lift, fade envelope and show card
       setTimeout(() => {
         envelopeWrap.classList.add("hideEnvelope");
         card.classList.add("show");
       }, 950);
-    });
+    }
 
-    /* ===== No button: small + moves around like crazy ===== */
+    openBtn.addEventListener("click", openEnvelope);
+    // Also allow clicking anywhere on the envelope/letter to open
+    envelope.addEventListener("click", (e) => {
+      // prevent double triggers if clicking button
+      if (e.target && e.target.id === "openBtn") return;
+      openEnvelope();
+    }, { once: true });
+
+    /* ===== No button: small & moves around like crazy ===== */
     const noBtn = document.getElementById("no");
     const btnRow = document.getElementById("btnRow");
 
-    // Place it absolute within btnRow
     noBtn.style.position = "absolute";
 
-    function teleportNo(aggressive = false){
+    function teleportNo(instant = false){
       const rowRect = btnRow.getBoundingClientRect();
       const btnRect = noBtn.getBoundingClientRect();
 
       const pad = 8;
-      const maxX = rowRect.width - btnRect.width - pad;
-      const maxY = rowRect.height - btnRect.height - pad;
+      const maxX = Math.max(pad, rowRect.width - btnRect.width - pad);
+      const maxY = Math.max(pad, rowRect.height - btnRect.height - pad);
 
-      const x = pad + Math.random() * Math.max(10, maxX);
-      const y = pad + Math.random() * Math.max(10, maxY);
+      const x = pad + Math.random() * maxX;
+      const y = pad + Math.random() * maxY;
 
-      // snap move (aggressive) or quick glide
-      noBtn.style.transition = aggressive ? "left 0.05s linear, top 0.05s linear" : "left 0.12s ease, top 0.12s ease";
+      noBtn.style.transition = instant ? "left 0.06s linear, top 0.06s linear" : "left 0.14s ease, top 0.14s ease";
       noBtn.style.left = x + "px";
       noBtn.style.top  = y + "px";
     }
 
-    // initial position
-    setTimeout(() => teleportNo(false), 200);
+    setTimeout(() => teleportNo(false), 250);
 
-    // move on hover and click
     noBtn.addEventListener("mouseenter", () => teleportNo(true));
     noBtn.addEventListener("mousemove", () => teleportNo(true));
-    noBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      teleportNo(true);
-    });
+    noBtn.addEventListener("click", (e) => { e.preventDefault(); teleportNo(true); });
 
-    // BONUS: move when cursor gets near it (more “unclickable”)
+    // move when cursor gets near it
     document.addEventListener("mousemove", (e) => {
+      if (!card.classList.contains("show")) return;
+      if (noBtn.style.display === "none") return;
+
       const r = noBtn.getBoundingClientRect();
       const cx = r.left + r.width/2;
       const cy = r.top + r.height/2;
       const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
 
-      // if you get within ~90px, it runs
-      if (dist < 90 && card.classList.contains("show") && noBtn.style.display !== "none") {
-        teleportNo(true);
-      }
+      if (dist < 95) teleportNo(true);
     });
 
-    /* ===== Yes: merge photos + update title + full confetti + music ===== */
+    /* ===== Yes: merge photos + update title + confetti + music ===== */
     const yesBtn = document.getElementById("yes");
     const yay = document.getElementById("yay");
     const title = document.getElementById("title");
@@ -614,11 +705,9 @@
 
       noBtn.style.display = "none";
 
-      // FULL PAGE confetti celebration
-      fullPageConfetti(2.6);
+      fullPageConfetti(2.8);
 
-      // optional mp3
-      try { await song.play(); } catch(e) {}
+      try{ await song.play(); } catch(e){}
     });
   </script>
 </body>
