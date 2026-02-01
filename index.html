@@ -1,303 +1,487 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Pasant & Yusuf 💘</title>
 
 <style>
-:root{
-  --pink:#ff3b7a;
-  --card:rgba(255,255,255,0.92);
-}
+  :root{
+    --pink:#ff3b7a;
+    --pink2:#ff6aa2;
+    --dark:#0f0f12;
+    --card: rgba(255,255,255,0.92);
+    --shadow: 0 18px 60px rgba(0,0,0,0.35);
+  }
 
-*{box-sizing:border-box;}
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; height:100vh; overflow:hidden;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:#000;
+    color:#111;
+  }
 
-body{
-  margin:0;
-  height:100vh;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  overflow:hidden;
-  background:#000;
-}
+  /* ===== Background slideshow (single layer, reliable) ===== */
+  .bg{
+    position:fixed; inset:0; z-index:-3;
+    background-size:cover; background-position:center;
+    filter: blur(2px) saturate(1.1);
+    transform: scale(1.05);
+    transition: opacity 1.2s ease-in-out;
+    opacity: 1;
+  }
+  .bg::after{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 20% 10%, rgba(255,59,122,0.22), transparent 45%),
+                radial-gradient(circle at 80% 30%, rgba(255,106,162,0.18), transparent 55%),
+                rgba(0,0,0,0.40);
+  }
 
-/* ===== BACKGROUND SLIDESHOW ===== */
-.bg{
-  position:fixed;
-  inset:0;
-  z-index:-2;
-}
-.bg::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.35);
-  z-index:2;
-}
-.bg-slide{
-  position:absolute;
-  inset:-20px;
-  background-size:cover;
-  background-position:center;
-  opacity:0;
-  transition:opacity 1.2s ease;
-  filter: blur(2px) saturate(1.1);
-}
-.bg-slide.active{opacity:1;}
+  /* floating hearts (subtle) */
+  .hearts{
+    position:fixed; inset:0; z-index:-2; pointer-events:none;
+    opacity:0.35;
+  }
+  .heart{
+    position:absolute;
+    width:14px; height:14px;
+    transform: rotate(45deg);
+    background: rgba(255,59,122,0.35);
+    border-radius: 3px;
+    animation: floatUp linear infinite;
+    filter: blur(0.2px);
+  }
+  .heart:before,.heart:after{
+    content:"";
+    position:absolute;
+    width:14px; height:14px;
+    background: inherit;
+    border-radius: 50%;
+  }
+  .heart:before{ left:-7px; top:0; }
+  .heart:after{ top:-7px; left:0; }
 
-/* ===== CARD ===== */
-.wrap{
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:18px;
-}
+  @keyframes floatUp{
+    from{ transform: translateY(20vh) rotate(45deg); opacity:0; }
+    10%{ opacity:0.55; }
+    to{ transform: translateY(-120vh) rotate(45deg); opacity:0; }
+  }
 
-.card{
-  width:min(520px,94vw);
-  background:var(--card);
-  border-radius:22px;
-  padding:22px;
-  box-shadow:0 18px 50px rgba(0,0,0,0.3);
-  position:relative;
-}
+  /* ===== Layout ===== */
+  .wrap{
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  }
 
-/* ===== HEADER ===== */
-.top{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
+  .card{
+    width:min(560px, 94vw);
+    background: var(--card);
+    border-radius: 26px;
+    box-shadow: var(--shadow);
+    padding: 26px 22px 22px;
+    position:relative;
+    overflow:hidden;
+    border: 1px solid rgba(255,255,255,0.55);
+    backdrop-filter: blur(10px);
+  }
 
-h1{
-  margin:0;
-  font-size:26px;
-}
+  /* soft glow border */
+  .card::before{
+    content:"";
+    position:absolute; inset:-2px;
+    background: radial-gradient(circle at 30% 20%, rgba(255,59,122,0.35), transparent 40%),
+                radial-gradient(circle at 80% 60%, rgba(255,106,162,0.28), transparent 50%);
+    opacity:0.55;
+    z-index:0;
+  }
+  .card > *{ position:relative; z-index:1; }
 
-.sub{
-  margin-top:6px;
-  opacity:.75;
-  font-size:14px;
-}
+  /* ===== Top Photos (big, left & right) ===== */
+  .topPhotos{
+    position:relative;
+    height: 120px;               /* reserved space for photos */
+    margin-bottom: 10px;
+  }
 
-/* ===== PROFILE PHOTOS ===== */
-.pfps{
-  margin-left:auto;
-  position:relative;
-}
+  .pfpFrame{
+    width: 110px;
+    height: 110px;
+    border-radius: 24px;         /* rounded square frame */
+    overflow:hidden;
+    border: 3px solid rgba(255,255,255,0.9);
+    box-shadow: 0 16px 30px rgba(0,0,0,0.22);
+    background:#ddd;
+    position:absolute;
+    top: 0;
+    transform: translateZ(0);
+    transition: transform .35s ease, filter .35s ease, opacity .35s ease;
+  }
+  .pfpFrame img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
 
-.pfpPair{
-  display:flex;
-  gap:10px;
-  transition:.45s ease;
-}
+  /* left & right placement */
+  #pasantFrame{ left: 0; }
+  #yusufFrame{ right: 0; }
 
-.pfp{
-  width:54px;
-  height:54px;
-  border-radius:50%;
-  border:3px solid #fff;
-  object-fit:cover;
-  box-shadow:0 8px 18px rgba(0,0,0,.25);
-}
+  /* Couple frame (hidden until YES) */
+  .coupleFrame{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform: translateX(-50%) scale(0.82);
+    width: 250px;
+    height: 110px;
+    border-radius: 26px;
+    overflow:hidden;
+    border: 3px solid rgba(255,255,255,0.92);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.25);
+    opacity:0;
+    filter: blur(2px);
+    transition: opacity .55s ease, transform .55s ease, filter .55s ease;
+    background:#ddd;
+  }
+  .coupleFrame img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
 
-/* MERGED COUPLE PHOTO */
-.pfpCouple{
-  width:130px;
-  height:56px;
-  border-radius:999px;
-  overflow:hidden;
-  border:3px solid #fff;
-  position:absolute;
-  top:0;
-  right:0;
-  opacity:0;
-  transform:scale(.7);
-  filter:blur(2px);
-  transition:.55s ease;
-}
-.pfpCouple img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
+  /* merge animation state */
+  .merged #pasantFrame,
+  .merged #yusufFrame{
+    opacity:0;
+    transform: scale(0.65) translateY(8px);
+    filter: blur(2px);
+    pointer-events:none;
+  }
+  .merged #coupleFrame{
+    opacity:1;
+    filter: blur(0);
+    transform: translateX(-50%) scale(1);
+    animation: pop .55s ease;
+  }
 
-/* AFTER YES */
-.merged .pfpPair{
-  opacity:0;
-  transform:scale(.5);
-  filter:blur(2px);
-}
-.merged .pfpCouple{
-  opacity:1;
-  transform:scale(1);
-  filter:none;
-}
+  @keyframes pop{
+    0%{ transform: translateX(-50%) scale(0.82); }
+    60%{ transform: translateX(-50%) scale(1.05); }
+    100%{ transform: translateX(-50%) scale(1.0); }
+  }
 
-/* ===== TEXT ===== */
-.question{
-  margin:16px 0;
-  font-size:18px;
-}
+  /* ===== Text ===== */
+  h1{
+    margin: 6px 0 0;
+    font-size: 28px;
+    line-height: 1.15;
+    letter-spacing: -0.2px;
+  }
+  .sub{
+    margin: 8px 0 0;
+    opacity:.78;
+    font-size:14px;
+  }
+  .question{
+    margin: 14px 0 16px;
+    font-size: 18px;
+    opacity:.92;
+  }
 
-/* ===== BUTTONS ===== */
-.btns{
-  position:relative;
-  height:60px;
-}
+  /* ===== Buttons (livelier) ===== */
+  .btnRow{
+    position:relative;
+    height:72px;                 /* space for teleport + animation */
+    margin-top: 6px;
+  }
 
-button{
-  padding:12px 18px;
-  border-radius:14px;
-  border:none;
-  font-size:16px;
-  cursor:pointer;
-}
+  .btn{
+    border:0;
+    padding: 14px 22px;
+    border-radius: 18px;
+    font-size: 16px;
+    cursor:pointer;
+    user-select:none;
+    transition: transform .16s ease, filter .16s ease, box-shadow .16s ease;
+    will-change: transform;
+  }
+  .btn:active{ transform: translateY(1px) scale(0.99); }
 
-#yes{
-  background:var(--pink);
-  color:white;
-  font-weight:700;
-}
+  /* YES button: gradient + shine + pulse */
+  #yes{
+    background: linear-gradient(135deg, var(--pink), var(--pink2));
+    color:#fff;
+    font-weight: 800;
+    box-shadow: 0 16px 32px rgba(255,59,122,0.28);
+    position:relative;
+    overflow:hidden;
+  }
+  #yes::after{
+    content:"";
+    position:absolute;
+    top:-30%;
+    left:-60%;
+    width: 60%;
+    height: 160%;
+    background: rgba(255,255,255,0.22);
+    transform: rotate(18deg);
+    transition: left .6s ease;
+  }
+  #yes:hover{
+    transform: translateY(-2px) scale(1.02);
+    filter: brightness(1.02);
+    box-shadow: 0 18px 38px rgba(255,59,122,0.33);
+  }
+  #yes:hover::after{ left:120%; }
 
-#no{
-  position:absolute;
-  background:#111;
-  color:white;
-  right:0;
-  top:0;
-}
+  /* subtle pulse */
+  #yes.pulsing{
+    animation: pulse 1.35s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ transform: translateY(0) scale(1); }
+    50%{ transform: translateY(-1px) scale(1.03); }
+  }
 
-/* ===== RESULT ===== */
-.yay{
-  display:none;
-  margin-top:16px;
-  padding:14px;
-  border-radius:14px;
-  background:#ffe6f0;
-}
+  /* NO button: dark + wiggle */
+  #no{
+    background: #15151a;
+    color:#fff;
+    position:absolute;
+    right:0;
+    top:0;
+    box-shadow: 0 14px 26px rgba(0,0,0,0.25);
+  }
+  #no:hover{
+    animation: wiggle .25s ease-in-out infinite;
+    filter: brightness(1.05);
+  }
+  @keyframes wiggle{
+    0%,100%{ transform: translateX(0); }
+    50%{ transform: translateX(-2px); }
+  }
 
-/* ===== SPOTIFY ===== */
-.spotify{
-  margin-top:14px;
-  border-radius:14px;
-  overflow:hidden;
-}
+  /* result box */
+  .yay{
+    display:none;
+    margin-top: 14px;
+    padding: 14px 14px;
+    border-radius: 18px;
+    background: rgba(255, 235, 243, 0.92);
+    border: 1px solid rgba(255, 59, 122, 0.22);
+    font-size: 16px;
+    line-height: 1.45;
+  }
 
-/* ===== CONFETTI ===== */
-#confetti{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:9999;
-}
+  .spotify{
+    margin-top: 14px;
+    border-radius: 16px;
+    overflow:hidden;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .tiny{
+    margin-top:10px;
+    font-size:12px;
+    opacity:.75;
+    text-align:center;
+  }
+
+  /* Confetti canvas */
+  #confettiCanvas{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:9999;
+  }
 </style>
 </head>
 
 <body>
 
-<!-- BACKGROUND -->
-<div class="bg">
-  <div class="bg-slide active" style="background-image:url('images/bg1.jpeg')"></div>
-  <div class="bg-slide" style="background-image:url('images/bg2.jpeg')"></div>
-  <div class="bg-slide" style="background-image:url('images/bg3.jpeg')"></div>
-  <div class="bg-slide" style="background-image:url('images/bg4.jpeg')"></div>
-</div>
-
-<canvas id="confetti"></canvas>
+<div class="bg" id="bg"></div>
+<div class="hearts" id="hearts"></div>
+<canvas id="confettiCanvas"></canvas>
 
 <div class="wrap">
   <div class="card" id="card">
 
-    <div class="top">
-      <div>
-        <h1 id="title">Will you be my Valentine? 💘</h1>
-        <div class="sub">Answer wisely.</div>
+    <!-- TOP PHOTO AREA -->
+    <div class="topPhotos" id="topPhotos">
+      <div class="pfpFrame" id="pasantFrame">
+        <img src="images/pasant1.jpeg" alt="Pasant">
+      </div>
+      <div class="pfpFrame" id="yusufFrame">
+        <img src="images/yusuf1.jpeg" alt="Yusuf">
       </div>
 
-      <div class="pfps" id="pfps">
-        <div class="pfpPair">
-          <img class="pfp" src="images/pasant1.jpeg">
-          <img class="pfp" src="images/yusuf1.jpeg">
-        </div>
-        <div class="pfpCouple">
-          <img src="images/couple.jpeg">
-        </div>
+      <div class="coupleFrame" id="coupleFrame">
+        <img src="images/couple.jpeg" alt="Pasant and Yusuf">
       </div>
     </div>
 
-    <div class="question">
-      Pasant… will you be my Valentine? 🌹
-    </div>
+    <h1 id="title">Will you be my Valentine? 💘</h1>
+    <div class="sub">Be careful… the “No” button is extremely shy 🙂</div>
 
-    <div class="btns" id="btnArea">
-      <button id="yes">Yes 😌</button>
-      <button id="no">No 🙂</button>
+    <div class="question">Pasant… will you be my Valentine? 🌹</div>
+
+    <div class="btnRow" id="btnRow">
+      <button class="btn pulsing" id="yes">Yes 😌</button>
+      <button class="btn" id="no">No 🙂</button>
     </div>
 
     <div class="yay" id="yay">
-      YAAAAY ❤️🎉<br>
-      Pasant & Yusuf — officially Valentines.
+      YAAAAY!! ❤️🎉<br/>
+      <b>Pasant & Yusuf</b> — officially Valentines.<br/>
+      Text me: <b>"YES Valentine"</b> 😄
     </div>
 
+    <!-- Spotify embed: replace src with your chosen track -->
     <div class="spotify">
-      <iframe style="border-radius:14px"
-        src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3"
-        width="100%" height="152" frameborder="0"
-        allow="autoplay; clipboard-write; encrypted-media">
+      <iframe
+        style="border-radius:16px"
+        src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator"
+        width="100%"
+        height="152"
+        frameBorder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy">
       </iframe>
     </div>
 
-    <audio id="song" src="song.mp3"></audio>
+    <div class="tiny">
+      Optional: add <b>song.mp3</b> in repo root to play audio after clicking “Yes”.
+    </div>
+
+    <audio id="song" src="song.mp3" preload="auto"></audio>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
 <script>
-/* BACKGROUND SLIDESHOW */
-const slides=document.querySelectorAll(".bg-slide");
-let i=0;
-setInterval(()=>{
-  slides[i].classList.remove("active");
-  i=(i+1)%slides.length;
-  slides[i].classList.add("active");
-},4500);
+  /* ===== Background slideshow (reliable) ===== */
+  const bg = document.getElementById("bg");
+  const bgImages = [
+    "images/bg1.jpeg",
+    "images/bg2.jpeg",
+    "images/bg3.jpeg",
+    "images/bg4.jpeg"
+  ];
+  let bgIndex = 0;
 
-/* NO BUTTON TELEPORT */
-const no=document.getElementById("no");
-const area=document.getElementById("btnArea");
-function moveNo(){
-  const r=area.getBoundingClientRect();
-  no.style.left=Math.random()*(r.width-80)+"px";
-  no.style.top=Math.random()*(r.height-40)+"px";
-}
-no.addEventListener("mouseenter",moveNo);
-no.addEventListener("click",e=>{e.preventDefault();moveNo();});
+  function setBg(i){
+    bg.style.opacity = "0";
+    setTimeout(() => {
+      bg.style.backgroundImage = `url('${bgImages[i]}')`;
+      bg.style.opacity = "1";
+    }, 450);
+  }
+  setBg(bgIndex);
+  setInterval(() => {
+    bgIndex = (bgIndex + 1) % bgImages.length;
+    setBg(bgIndex);
+  }, 4500);
 
-/* YES BUTTON */
-const yes=document.getElementById("yes");
-const yay=document.getElementById("yay");
-const pfps=document.getElementById("pfps");
-const title=document.getElementById("title");
-const song=document.getElementById("song");
+  /* ===== Floating hearts (subtle ambience) ===== */
+  const hearts = document.getElementById("hearts");
+  function spawnHeart(){
+    const h = document.createElement("div");
+    h.className = "heart";
+    const left = Math.random() * 100;
+    const size = 10 + Math.random() * 14;         // 10..24px
+    const dur = 7 + Math.random() * 8;            // 7..15s
+    const delay = Math.random() * 2;              // 0..2s
+    h.style.left = left + "vw";
+    h.style.bottom = (-10 - Math.random() * 20) + "vh";
+    h.style.width = size + "px";
+    h.style.height = size + "px";
+    h.style.animationDuration = dur + "s";
+    h.style.animationDelay = delay + "s";
+    hearts.appendChild(h);
+    setTimeout(() => h.remove(), (dur + delay) * 1000);
+  }
+  for(let i=0;i<14;i++) spawnHeart();
+  setInterval(spawnHeart, 900);
 
-const confettiFire=confetti.create(document.getElementById("confetti"),{resize:true});
+  /* ===== No button teleport (inside whole card) ===== */
+  const noBtn = document.getElementById("no");
+  const card = document.getElementById("card");
+  const btnRow = document.getElementById("btnRow");
 
-yes.onclick=async()=>{
-  yay.style.display="block";
-  title.textContent="Pasant & Yusuf 💘";
-  pfps.classList.add("merged");
-  no.style.display="none";
-  yes.disabled=true;
-  yes.textContent="Locked in ✅";
+  function teleportNo(){
+    const cardRect = card.getBoundingClientRect();
+    const rowRect  = btnRow.getBoundingClientRect();
+    const btnRect  = noBtn.getBoundingClientRect();
 
-  confettiFire({particleCount:160,spread:80,origin:{y:.6}});
-  setTimeout(()=>confettiFire({particleCount:100,spread:120}),250);
+    // constrain it to the button row area (cleaner), but truly random inside it
+    const pad = 6;
+    const maxX = rowRect.width - btnRect.width - pad;
+    const maxY = rowRect.height - btnRect.height - pad;
 
-  try{ await song.play(); }catch{}
-};
+    const x = Math.max(pad, Math.random() * maxX);
+    const y = Math.max(pad, Math.random() * maxY);
+
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
+  }
+
+  // absolute position inside the row
+  noBtn.style.position = "absolute";
+  teleportNo();
+
+  // make it basically unclickable
+  noBtn.addEventListener("mouseenter", teleportNo);
+  noBtn.addEventListener("mousemove", teleportNo);
+  noBtn.addEventListener("click", (e) => { e.preventDefault(); teleportNo(); });
+
+  /* ===== Confetti ===== */
+  const myConfetti = confetti.create(document.getElementById("confettiCanvas"), {
+    resize:true,
+    useWorker:true
+  });
+  function burst(){
+    myConfetti({ particleCount: 160, spread: 75, origin: { y: 0.62 } });
+    setTimeout(() => myConfetti({ particleCount: 110, spread: 110, origin: { y: 0.55 } }), 220);
+    setTimeout(() => myConfetti({ particleCount: 90,  spread: 95,  origin: { y: 0.60 } }), 430);
+  }
+
+  /* ===== YES action: merge photos + update title + confetti + play music ===== */
+  const yesBtn = document.getElementById("yes");
+  const yay = document.getElementById("yay");
+  const title = document.getElementById("title");
+  const topPhotos = document.getElementById("topPhotos");
+  const song = document.getElementById("song");
+
+  yesBtn.addEventListener("click", async () => {
+    // UI updates
+    yay.style.display = "block";
+    title.textContent = "Pasant & Yusuf 💘";
+    topPhotos.classList.add("merged");
+
+    yesBtn.classList.remove("pulsing");
+    yesBtn.textContent = "Locked in ✅";
+    yesBtn.disabled = true;
+
+    // hide no forever
+    noBtn.style.display = "none";
+
+    // confetti
+    burst();
+
+    // try play local mp3 (optional)
+    try{
+      await song.play();
+    } catch(e){
+      // ignore if blocked / missing
+    }
+  });
 </script>
 
 </body>
