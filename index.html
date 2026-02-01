@@ -573,24 +573,30 @@
 
     /* ===== Confetti (full page, DPR fixed) ===== */
     const canvas = document.getElementById("confettiCanvas");
-
     function resizeCanvas(){
-      const dpr = Math.min(window.devicePixelRatio || 1, 2); // cap for iPhone performance
-      canvas.width  = Math.floor(window.innerWidth * dpr);
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(window.innerWidth * dpr);
       canvas.height = Math.floor(window.innerHeight * dpr);
-      canvas.style.width  = window.innerWidth + "px";
+      canvas.style.width = window.innerWidth + "px";
       canvas.style.height = window.innerHeight + "px";
-
-      // scale drawing to match DPR
-      const ctx = canvas.getContext("2d");
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas, { passive: true });
+    window.addEventListener("resize", resizeCanvas);
 
-    // IMPORTANT: use this canvas specifically (no Worker issues on iOS sometimes)
-    const myConfetti = confetti.create(canvas, { resize: false, useWorker: false });
+    const myConfetti = confetti.create(canvas, { resize: false, useWorker: true });
+    function remindsConfetti(seconds = 2.8){
+      const end = Date.now() + seconds * 1000;
+      (function frame(){
+        myConfetti({
+          particleCount: 34,
+          spread: 150,
+          startVelocity: 38,
+          scalar: 1.05,
+          origin: { x: Math.random(), y: Math.random() * 0.95 }
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+    }
 
 
     /* ===== Screen switching (no layout bugs) ===== */
