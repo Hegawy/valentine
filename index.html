@@ -34,43 +34,21 @@
   .bg::after{
     content:"";
     position:absolute; inset:0;
-    background: radial-gradient(circle at 20% 10%, rgba(255,59,122,0.22), transparent 45%),
-                radial-gradient(circle at 80% 30%, rgba(255,106,162,0.18), transparent 55%),
-                rgba(0,0,0,0.40);
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,59,122,0.22), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(255,106,162,0.18), transparent 55%),
+      rgba(0,0,0,0.42);
   }
 
-  /* floating hearts (subtle) */
-  .hearts{
-    position:fixed; inset:0; z-index:-2; pointer-events:none;
-    opacity:0.35;
-  }
-  .heart{
-    position:absolute;
-    width:14px; height:14px;
-    transform: rotate(45deg);
-    background: rgba(255,59,122,0.35);
-    border-radius: 3px;
-    animation: floatUp linear infinite;
-    filter: blur(0.2px);
-  }
-  .heart:before,.heart:after{
-    content:"";
-    position:absolute;
-    width:14px; height:14px;
-    background: inherit;
-    border-radius: 50%;
-  }
-  .heart:before{ left:-7px; top:0; }
-  .heart:after{ top:-7px; left:0; }
-
-  @keyframes floatUp{
-    from{ transform: translateY(20vh) rotate(45deg); opacity:0; }
-    10%{ opacity:0.55; }
-    to{ transform: translateY(-120vh) rotate(45deg); opacity:0; }
+  /* Full page confetti canvas */
+  #confettiCanvas{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:9999;
   }
 
-  /* ===== Layout ===== */
-  .wrap{
+  /* ===== Stage layout ===== */
+  .stage{
     height:100%;
     display:flex;
     align-items:center;
@@ -78,47 +56,191 @@
     padding:18px;
   }
 
-  .card{
+  /* =========================
+     ENVELOPE INTRO
+  ========================== */
+  .envelopeWrap{
     width:min(560px, 94vw);
+    display:flex;
+    justify-content:center;
+  }
+
+  .envelope{
+    width:min(520px, 94vw);
+    height: 340px;
+    position:relative;
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    overflow:hidden;
+    border: 1px solid rgba(255,255,255,0.55);
+  }
+
+  /* Envelope base */
+  .envBase{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,59,122,0.14), transparent 45%),
+      radial-gradient(circle at 80% 60%, rgba(255,106,162,0.12), transparent 55%),
+      rgba(255,255,255,0.92);
+  }
+
+  /* Envelope flap */
+  .envFlap{
+    position:absolute;
+    left:0; right:0;
+    top:0;
+    height: 58%;
+    background: linear-gradient(135deg, rgba(255,59,122,0.12), rgba(255,106,162,0.08));
+    clip-path: polygon(0 0, 100% 0, 50% 82%);
+    transform-origin: top;
+    transition: transform .9s cubic-bezier(.2,.85,.2,1);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+
+  /* Bottom folds */
+  .envFoldL, .envFoldR{
+    position:absolute;
+    bottom:0;
+    width:55%;
+    height:62%;
+    background: rgba(0,0,0,0.02);
+    filter: blur(0.0px);
+  }
+  .envFoldL{
+    left:-5%;
+    clip-path: polygon(0 100%, 100% 100%, 55% 0);
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+  .envFoldR{
+    right:-5%;
+    clip-path: polygon(0 100%, 100% 100%, 45% 0);
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+
+  /* Letter card inside envelope */
+  .letter{
+    position:absolute;
+    left:50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    width: 86%;
+    height: 72%;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+    border: 1px solid rgba(0,0,0,0.06);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 18px;
+    transition: transform .9s cubic-bezier(.2,.85,.2,1), opacity .6s ease;
+  }
+
+  .openMe{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    align-items:center;
+  }
+
+  .openTitle{
+    font-size: 26px;
+    margin:0;
+    letter-spacing:-0.2px;
+  }
+  .openSub{
+    margin:0;
+    opacity:.8;
+    font-size: 14px;
+  }
+  .openBtn{
+    margin-top: 6px;
+    border:0;
+    padding: 12px 18px;
+    border-radius: 16px;
+    cursor:pointer;
+    color:#fff;
+    font-weight:800;
+    background: linear-gradient(135deg, var(--pink), var(--pink2));
+    box-shadow: 0 16px 30px rgba(255,59,122,0.28);
+    transition: transform .15s ease, filter .15s ease;
+  }
+  .openBtn:hover{ transform: translateY(-2px) scale(1.02); filter: brightness(1.03); }
+  .openBtn:active{ transform: translateY(0) scale(0.99); }
+
+  /* Opening animation state */
+  .opened .envFlap{
+    transform: rotateX(180deg);
+  }
+  .opened .letter{
+    transform: translateX(-50%) translateY(-180px) scale(1.03);
+  }
+
+  /* Fade envelope away and reveal main card */
+  .hideEnvelope{
+    opacity:0;
+    transform: translateY(16px) scale(0.98);
+    transition: opacity .55s ease, transform .55s ease;
+    pointer-events:none;
+  }
+
+  /* =========================
+     MAIN VALENTINE CARD
+  ========================== */
+  .card{
+    width:min(600px, 94vw);
     background: var(--card);
-    border-radius: 26px;
+    border-radius: 28px;
     box-shadow: var(--shadow);
     padding: 26px 22px 22px;
     position:relative;
     overflow:hidden;
     border: 1px solid rgba(255,255,255,0.55);
     backdrop-filter: blur(10px);
+    opacity:0;
+    transform: translateY(18px) scale(0.98);
+    pointer-events:none;
+    transition: opacity .65s ease, transform .65s ease;
   }
 
-  /* soft glow border */
+  .card.show{
+    opacity:1;
+    transform: translateY(0) scale(1);
+    pointer-events:auto;
+  }
+
+  /* soft glow */
   .card::before{
     content:"";
     position:absolute; inset:-2px;
-    background: radial-gradient(circle at 30% 20%, rgba(255,59,122,0.35), transparent 40%),
-                radial-gradient(circle at 80% 60%, rgba(255,106,162,0.28), transparent 50%);
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,59,122,0.32), transparent 42%),
+      radial-gradient(circle at 80% 60%, rgba(255,106,162,0.25), transparent 55%);
     opacity:0.55;
     z-index:0;
   }
   .card > *{ position:relative; z-index:1; }
 
-  /* ===== Top Photos (big, left & right) ===== */
+  /* Bigger top photo container */
   .topPhotos{
     position:relative;
-    height: 120px;               /* reserved space for photos */
+    height: 170px;
     margin-bottom: 10px;
   }
 
   .pfpFrame{
-    width: 110px;
-    height: 110px;
-    border-radius: 24px;         /* rounded square frame */
+    width: 140px;
+    height: 140px;
+    border-radius: 28px;
     overflow:hidden;
-    border: 3px solid rgba(255,255,255,0.9);
-    box-shadow: 0 16px 30px rgba(0,0,0,0.22);
+    border: 3px solid rgba(255,255,255,0.92);
+    box-shadow: 0 18px 34px rgba(0,0,0,0.22);
     background:#ddd;
     position:absolute;
     top: 0;
-    transform: translateZ(0);
     transition: transform .35s ease, filter .35s ease, opacity .35s ease;
   }
   .pfpFrame img{
@@ -127,23 +249,21 @@
     object-fit:cover;
     display:block;
   }
+  #pasantFrame{ left:0; }
+  #yusufFrame{ right:0; }
 
-  /* left & right placement */
-  #pasantFrame{ left: 0; }
-  #yusufFrame{ right: 0; }
-
-  /* Couple frame (hidden until YES) */
+  /* Couple frame bigger */
   .coupleFrame{
     position:absolute;
     left:50%;
     top:0;
     transform: translateX(-50%) scale(0.82);
-    width: 250px;
-    height: 110px;
-    border-radius: 26px;
+    width: 340px;
+    height: 140px;
+    border-radius: 32px;
     overflow:hidden;
-    border: 3px solid rgba(255,255,255,0.92);
-    box-shadow: 0 18px 36px rgba(0,0,0,0.25);
+    border: 3px solid rgba(255,255,255,0.94);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.24);
     opacity:0;
     filter: blur(2px);
     transition: opacity .55s ease, transform .55s ease, filter .55s ease;
@@ -156,11 +276,11 @@
     display:block;
   }
 
-  /* merge animation state */
+  /* merge state */
   .merged #pasantFrame,
   .merged #yusufFrame{
     opacity:0;
-    transform: scale(0.65) translateY(8px);
+    transform: scale(0.65) translateY(10px);
     filter: blur(2px);
     pointer-events:none;
   }
@@ -170,17 +290,15 @@
     transform: translateX(-50%) scale(1);
     animation: pop .55s ease;
   }
-
   @keyframes pop{
     0%{ transform: translateX(-50%) scale(0.82); }
     60%{ transform: translateX(-50%) scale(1.05); }
     100%{ transform: translateX(-50%) scale(1.0); }
   }
 
-  /* ===== Text ===== */
   h1{
-    margin: 6px 0 0;
-    font-size: 28px;
+    margin: 8px 0 0;
+    font-size: 30px;
     line-height: 1.15;
     letter-spacing: -0.2px;
   }
@@ -195,10 +313,10 @@
     opacity:.92;
   }
 
-  /* ===== Buttons (livelier) ===== */
+  /* Buttons row */
   .btnRow{
     position:relative;
-    height:72px;                 /* space for teleport + animation */
+    height: 78px;
     margin-top: 6px;
   }
 
@@ -214,11 +332,11 @@
   }
   .btn:active{ transform: translateY(1px) scale(0.99); }
 
-  /* YES button: gradient + shine + pulse */
+  /* YES button lively */
   #yes{
     background: linear-gradient(135deg, var(--pink), var(--pink2));
     color:#fff;
-    font-weight: 800;
+    font-weight: 900;
     box-shadow: 0 16px 32px rgba(255,59,122,0.28);
     position:relative;
     overflow:hidden;
@@ -226,46 +344,43 @@
   #yes::after{
     content:"";
     position:absolute;
-    top:-30%;
-    left:-60%;
+    top:-35%;
+    left:-65%;
     width: 60%;
-    height: 160%;
+    height: 180%;
     background: rgba(255,255,255,0.22);
     transform: rotate(18deg);
     transition: left .6s ease;
   }
   #yes:hover{
     transform: translateY(-2px) scale(1.02);
-    filter: brightness(1.02);
-    box-shadow: 0 18px 38px rgba(255,59,122,0.33);
+    filter: brightness(1.03);
+    box-shadow: 0 20px 42px rgba(255,59,122,0.33);
   }
-  #yes:hover::after{ left:120%; }
+  #yes:hover::after{ left:125%; }
 
-  /* subtle pulse */
-  #yes.pulsing{
-    animation: pulse 1.35s ease-in-out infinite;
-  }
+  #yes.pulsing{ animation: pulse 1.35s ease-in-out infinite; }
   @keyframes pulse{
     0%,100%{ transform: translateY(0) scale(1); }
     50%{ transform: translateY(-1px) scale(1.03); }
   }
 
-  /* NO button: dark + wiggle */
+  /* NO button: must stay SMALL and NOT resize */
   #no{
+    position:absolute;
+    top: 8px;
+    left: 360px; /* gets overridden by JS anyway */
+    padding: 10px 14px;          /* smaller than YES */
+    border-radius: 14px;
+    font-size: 14px;
     background: #15151a;
     color:#fff;
-    position:absolute;
-    right:0;
-    top:0;
     box-shadow: 0 14px 26px rgba(0,0,0,0.25);
+    width: auto;                 /* keep natural small size */
+    transform: none !important;  /* never scale */
   }
   #no:hover{
-    animation: wiggle .25s ease-in-out infinite;
     filter: brightness(1.05);
-  }
-  @keyframes wiggle{
-    0%,100%{ transform: translateX(0); }
-    50%{ transform: translateX(-2px); }
   }
 
   /* result box */
@@ -293,196 +408,218 @@
     opacity:.75;
     text-align:center;
   }
-
-  /* Confetti canvas */
-  #confettiCanvas{
-    position:fixed; inset:0;
-    pointer-events:none;
-    z-index:9999;
-  }
 </style>
 </head>
 
 <body>
+  <div class="bg" id="bg"></div>
+  <canvas id="confettiCanvas"></canvas>
 
-<div class="bg" id="bg"></div>
-<div class="hearts" id="hearts"></div>
-<canvas id="confettiCanvas"></canvas>
+  <div class="stage">
+    <!-- ENVELOPE INTRO -->
+    <div class="envelopeWrap" id="envelopeWrap">
+      <div class="envelope" id="envelope">
+        <div class="envBase"></div>
+        <div class="envFlap"></div>
+        <div class="envFoldL"></div>
+        <div class="envFoldR"></div>
 
-<div class="wrap">
-  <div class="card" id="card">
-
-    <!-- TOP PHOTO AREA -->
-    <div class="topPhotos" id="topPhotos">
-      <div class="pfpFrame" id="pasantFrame">
-        <img src="images/pasant1.jpeg" alt="Pasant">
+        <div class="letter" id="letter">
+          <div class="openMe">
+            <h2 class="openTitle">💌 Open me</h2>
+            <p class="openSub">A message for <b>Pasant</b> from <b>Yusuf</b></p>
+            <button class="openBtn" id="openBtn">Open</button>
+          </div>
+        </div>
       </div>
-      <div class="pfpFrame" id="yusufFrame">
-        <img src="images/yusuf1.jpeg" alt="Yusuf">
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="card" id="card">
+      <div class="topPhotos" id="topPhotos">
+        <div class="pfpFrame" id="pasantFrame">
+          <img src="images/pasant1.jpeg" alt="Pasant">
+        </div>
+        <div class="pfpFrame" id="yusufFrame">
+          <img src="images/yusuf1.jpeg" alt="Yusuf">
+        </div>
+
+        <div class="coupleFrame" id="coupleFrame">
+          <img src="images/couple.jpeg" alt="Pasant and Yusuf">
+        </div>
       </div>
 
-      <div class="coupleFrame" id="coupleFrame">
-        <img src="images/couple.jpeg" alt="Pasant and Yusuf">
+      <h1 id="title">Will you be my Valentine? 💘</h1>
+      <div class="sub">Pasant… there is only one correct answer 😌</div>
+
+      <div class="question">Will you be my Valentine, Pasant? 🌹</div>
+
+      <div class="btnRow" id="btnRow">
+        <button class="btn pulsing" id="yes">Yes 😌</button>
+        <button class="btn" id="no">No 🙂</button>
       </div>
+
+      <div class="yay" id="yay">
+        YAAAAY!! ❤️🎉<br/>
+        <b>Pasant & Yusuf</b> — officially Valentines.<br/>
+        Text me: <b>"YES Valentine"</b> 😄
+      </div>
+
+      <div class="spotify">
+        <iframe
+          style="border-radius:16px"
+          src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator"
+          width="100%"
+          height="152"
+          frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"></iframe>
+      </div>
+
+      <div class="tiny">
+        Optional: add <b>song.mp3</b> in repo root to play audio after clicking “Yes”.
+      </div>
+
+      <audio id="song" src="song.mp3" preload="auto"></audio>
     </div>
-
-    <h1 id="title">Will you be my Valentine? 💘</h1>
-    <div class="sub">Be careful… the “No” button is extremely shy 🙂</div>
-
-    <div class="question">Pasant… will you be my Valentine? 🌹</div>
-
-    <div class="btnRow" id="btnRow">
-      <button class="btn pulsing" id="yes">Yes 😌</button>
-      <button class="btn" id="no">No 🙂</button>
-    </div>
-
-    <div class="yay" id="yay">
-      YAAAAY!! ❤️🎉<br/>
-      <b>Pasant & Yusuf</b> — officially Valentines.<br/>
-      Text me: <b>"YES Valentine"</b> 😄
-    </div>
-
-    <!-- Spotify embed: replace src with your chosen track -->
-    <div class="spotify">
-      <iframe
-        style="border-radius:16px"
-        src="https://open.spotify.com/embed/track/7qiZfU4dY1lWllzX7mPBI3?utm_source=generator"
-        width="100%"
-        height="152"
-        frameBorder="0"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy">
-      </iframe>
-    </div>
-
-    <div class="tiny">
-      Optional: add <b>song.mp3</b> in repo root to play audio after clicking “Yes”.
-    </div>
-
-    <audio id="song" src="song.mp3" preload="auto"></audio>
   </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
-<script>
-  /* ===== Background slideshow (reliable) ===== */
-  const bg = document.getElementById("bg");
-  const bgImages = [
-    "images/bg1.jpeg",
-    "images/bg2.jpeg",
-    "images/bg3.jpeg",
-    "images/bg4.jpeg"
-  ];
-  let bgIndex = 0;
+  <script>
+    /* ===== Background slideshow ===== */
+    const bg = document.getElementById("bg");
+    const bgImages = [
+      "images/bg1.jpeg",
+      "images/bg2.jpeg",
+      "images/bg3.jpeg",
+      "images/bg4.jpeg"
+    ];
+    let bgIndex = 0;
 
-  function setBg(i){
-    bg.style.opacity = "0";
-    setTimeout(() => {
-      bg.style.backgroundImage = `url('${bgImages[i]}')`;
-      bg.style.opacity = "1";
-    }, 450);
-  }
-  setBg(bgIndex);
-  setInterval(() => {
-    bgIndex = (bgIndex + 1) % bgImages.length;
-    setBg(bgIndex);
-  }, 4500);
-
-  /* ===== Floating hearts (subtle ambience) ===== */
-  const hearts = document.getElementById("hearts");
-  function spawnHeart(){
-    const h = document.createElement("div");
-    h.className = "heart";
-    const left = Math.random() * 100;
-    const size = 10 + Math.random() * 14;         // 10..24px
-    const dur = 7 + Math.random() * 8;            // 7..15s
-    const delay = Math.random() * 2;              // 0..2s
-    h.style.left = left + "vw";
-    h.style.bottom = (-10 - Math.random() * 20) + "vh";
-    h.style.width = size + "px";
-    h.style.height = size + "px";
-    h.style.animationDuration = dur + "s";
-    h.style.animationDelay = delay + "s";
-    hearts.appendChild(h);
-    setTimeout(() => h.remove(), (dur + delay) * 1000);
-  }
-  for(let i=0;i<14;i++) spawnHeart();
-  setInterval(spawnHeart, 900);
-
-  /* ===== No button teleport (inside whole card) ===== */
-  const noBtn = document.getElementById("no");
-  const card = document.getElementById("card");
-  const btnRow = document.getElementById("btnRow");
-
-  function teleportNo(){
-    const cardRect = card.getBoundingClientRect();
-    const rowRect  = btnRow.getBoundingClientRect();
-    const btnRect  = noBtn.getBoundingClientRect();
-
-    // constrain it to the button row area (cleaner), but truly random inside it
-    const pad = 6;
-    const maxX = rowRect.width - btnRect.width - pad;
-    const maxY = rowRect.height - btnRect.height - pad;
-
-    const x = Math.max(pad, Math.random() * maxX);
-    const y = Math.max(pad, Math.random() * maxY);
-
-    noBtn.style.left = x + "px";
-    noBtn.style.top  = y + "px";
-  }
-
-  // absolute position inside the row
-  noBtn.style.position = "absolute";
-  teleportNo();
-
-  // make it basically unclickable
-  noBtn.addEventListener("mouseenter", teleportNo);
-  noBtn.addEventListener("mousemove", teleportNo);
-  noBtn.addEventListener("click", (e) => { e.preventDefault(); teleportNo(); });
-
-  /* ===== Confetti ===== */
-  const myConfetti = confetti.create(document.getElementById("confettiCanvas"), {
-    resize:true,
-    useWorker:true
-  });
-  function burst(){
-    myConfetti({ particleCount: 160, spread: 75, origin: { y: 0.62 } });
-    setTimeout(() => myConfetti({ particleCount: 110, spread: 110, origin: { y: 0.55 } }), 220);
-    setTimeout(() => myConfetti({ particleCount: 90,  spread: 95,  origin: { y: 0.60 } }), 430);
-  }
-
-  /* ===== YES action: merge photos + update title + confetti + play music ===== */
-  const yesBtn = document.getElementById("yes");
-  const yay = document.getElementById("yay");
-  const title = document.getElementById("title");
-  const topPhotos = document.getElementById("topPhotos");
-  const song = document.getElementById("song");
-
-  yesBtn.addEventListener("click", async () => {
-    // UI updates
-    yay.style.display = "block";
-    title.textContent = "Pasant & Yusuf 💘";
-    topPhotos.classList.add("merged");
-
-    yesBtn.classList.remove("pulsing");
-    yesBtn.textContent = "Locked in ✅";
-    yesBtn.disabled = true;
-
-    // hide no forever
-    noBtn.style.display = "none";
-
-    // confetti
-    burst();
-
-    // try play local mp3 (optional)
-    try{
-      await song.play();
-    } catch(e){
-      // ignore if blocked / missing
+    function setBg(i){
+      bg.style.opacity = "0";
+      setTimeout(() => {
+        bg.style.backgroundImage = `url('${bgImages[i]}')`;
+        bg.style.opacity = "1";
+      }, 450);
     }
-  });
-</script>
+    setBg(bgIndex);
+    setInterval(() => {
+      bgIndex = (bgIndex + 1) % bgImages.length;
+      setBg(bgIndex);
+    }, 4500);
 
+    /* ===== Confetti full-page (bursts everywhere) ===== */
+    const myConfetti = confetti.create(document.getElementById("confettiCanvas"), {
+      resize: true,
+      useWorker: true
+    });
+
+    function fullPageConfetti(seconds = 2.2){
+      const end = Date.now() + seconds * 1000;
+
+      (function frame(){
+        // random bursts across the whole screen
+        myConfetti({
+          particleCount: 28,
+          spread: 120,
+          startVelocity: 35,
+          scalar: 1.0,
+          origin: { x: Math.random(), y: Math.random() * 0.9 }
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+    }
+
+    /* ===== Envelope open -> reveal card ===== */
+    const openBtn = document.getElementById("openBtn");
+    const envelope = document.getElementById("envelope");
+    const envelopeWrap = document.getElementById("envelopeWrap");
+    const card = document.getElementById("card");
+
+    openBtn.addEventListener("click", () => {
+      envelope.classList.add("opened");
+
+      // after flap open + letter lift, fade envelope and show card
+      setTimeout(() => {
+        envelopeWrap.classList.add("hideEnvelope");
+        card.classList.add("show");
+      }, 950);
+    });
+
+    /* ===== No button: small + moves around like crazy ===== */
+    const noBtn = document.getElementById("no");
+    const btnRow = document.getElementById("btnRow");
+
+    // Place it absolute within btnRow
+    noBtn.style.position = "absolute";
+
+    function teleportNo(aggressive = false){
+      const rowRect = btnRow.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const pad = 8;
+      const maxX = rowRect.width - btnRect.width - pad;
+      const maxY = rowRect.height - btnRect.height - pad;
+
+      const x = pad + Math.random() * Math.max(10, maxX);
+      const y = pad + Math.random() * Math.max(10, maxY);
+
+      // snap move (aggressive) or quick glide
+      noBtn.style.transition = aggressive ? "left 0.05s linear, top 0.05s linear" : "left 0.12s ease, top 0.12s ease";
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+    }
+
+    // initial position
+    setTimeout(() => teleportNo(false), 200);
+
+    // move on hover and click
+    noBtn.addEventListener("mouseenter", () => teleportNo(true));
+    noBtn.addEventListener("mousemove", () => teleportNo(true));
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      teleportNo(true);
+    });
+
+    // BONUS: move when cursor gets near it (more “unclickable”)
+    document.addEventListener("mousemove", (e) => {
+      const r = noBtn.getBoundingClientRect();
+      const cx = r.left + r.width/2;
+      const cy = r.top + r.height/2;
+      const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+
+      // if you get within ~90px, it runs
+      if (dist < 90 && card.classList.contains("show") && noBtn.style.display !== "none") {
+        teleportNo(true);
+      }
+    });
+
+    /* ===== Yes: merge photos + update title + full confetti + music ===== */
+    const yesBtn = document.getElementById("yes");
+    const yay = document.getElementById("yay");
+    const title = document.getElementById("title");
+    const topPhotos = document.getElementById("topPhotos");
+    const song = document.getElementById("song");
+
+    yesBtn.addEventListener("click", async () => {
+      yay.style.display = "block";
+      title.textContent = "Pasant & Yusuf 💘";
+      topPhotos.classList.add("merged");
+
+      yesBtn.classList.remove("pulsing");
+      yesBtn.textContent = "Locked in ✅";
+      yesBtn.disabled = true;
+
+      noBtn.style.display = "none";
+
+      // FULL PAGE confetti celebration
+      fullPageConfetti(2.6);
+
+      // optional mp3
+      try { await song.play(); } catch(e) {}
+    });
+  </script>
 </body>
 </html>
